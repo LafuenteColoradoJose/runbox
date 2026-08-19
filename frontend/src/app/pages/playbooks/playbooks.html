@@ -1,0 +1,23 @@
+<div class="page-header">
+  <h1>Playbooks</h1>
+  <p>Manage and execute your Ansible playbooks</p>
+</div>
+
+@if (loading()) {
+  <div class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else {
+  <div class="playbooks-grid">
+    @for (playbook of playbooks(); track playbook.id) {
+      <app-playbook-card 
+        [playbook]="playbook" 
+        (onRun)="runPlaybook($event)">
+      </app-playbook-card>
+    } @empty {
+      <div class="empty-state">
+        <p>No playbooks found. Create one in the database.</p>
+      </div>
+    }
+  </div>
+}
