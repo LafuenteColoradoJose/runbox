@@ -73,6 +73,10 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Backend server escuchando en el puerto ${PORT}`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`Backend server escuchando en el puerto ${PORT}`);
+  });
+}
+
+module.exports = { app, server };
