@@ -51,7 +51,7 @@ El proyecto contiene un `Dockerfile` optimizado (_multistage build_).
     *   Copia los estáticos de Angular dentro de `/backend/public`.
     *   Express sirve simultáneamente la API y los estáticos de Angular en el puerto `3000`.
 
-### Comandos de Despliegue
+### Comandos de Despliegue (Producción)
 ```bash
 # Construir la imagen
 docker build -t runbox .
@@ -59,3 +59,23 @@ docker build -t runbox .
 # Ejecutar el contenedor en segundo plano en el puerto 3001
 docker run -d -p 3001:3000 --name runbox runbox:latest
 ```
+
+---
+
+## 💻 Entorno de Desarrollo Local
+
+Para facilitar el desarrollo y las pruebas sin depender puramente de la reconstrucción de la imagen Docker en cada paso, el proyecto cuenta con dos scripts de conveniencia en la raíz:
+
+### `start.sh`
+Orquesta el arranque secuencial de:
+1. El contenedor Docker de pruebas (`runbox_test`).
+2. El servidor Backend de Express (`node backend/server.js`) en el puerto 3000.
+3. El servidor de desarrollo de Angular (`ng serve`) en el puerto 4200.
+
+Intercepta la señal de apagado (`Ctrl+C`) para derivar su ejecución a `stop.sh`.
+
+### `stop.sh`
+Detiene el ecosistema de forma ordenada mediante `pkill` (delimitado al usuario actual para evitar matar procesos del contenedor) y comandos nativos de Docker:
+1. Detiene el Frontend.
+2. Detiene el Backend local.
+3. Apaga el contenedor Docker.

@@ -6,10 +6,22 @@ Runbox está diseñado para simplificar las ejecuciones de los *Playbooks* de An
 
 ---
 
-## 🚀 Requisitos Previos
+## 🚀 Requisitos Previos e Inicialización
 
 Para utilizar la herramienta, asegúrate de que Runbox esté en ejecución. El administrador del sistema puede proporcionarte una URL de acceso. 
-Si lo ejecutas localmente, necesitarás tener instalado **Docker**.
+Si lo ejecutas localmente, necesitarás tener instalado **Docker** y **Node.js**.
+
+Para arrancar el ecosistema completo en tu máquina de desarrollo, simplemente abre una terminal en la raíz del proyecto y ejecuta:
+
+```bash
+./start.sh
+```
+
+Esto levantará tanto la base de datos como los servidores locales. Cuando termines de trabajar, puedes presionar `Ctrl + C` en esa misma terminal o ejecutar en otra ventana:
+
+```bash
+./stop.sh
+```
 
 ---
 
