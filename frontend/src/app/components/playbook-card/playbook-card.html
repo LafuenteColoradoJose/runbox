@@ -1,1 +1,15 @@
-<p>playbook-card works!</p>
+<mat-card class="playbook-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="playbook-icon">integration_instructions</mat-icon>
+        <mat-card-title>{{ playbook.name }}</mat-card-title>
+        <mat-card-subtitle>{{ playbook.path }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ playbook.description || 'No description provided.' }}</p>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-flat-button color="primary" (click)="onRun.emit(playbook)">
+          <mat-icon>play_arrow</mat-icon> Run
+        </button>
+      </mat-card-actions>
+    </mat-card>

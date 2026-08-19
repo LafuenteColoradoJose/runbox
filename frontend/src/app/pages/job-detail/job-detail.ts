@@ -11,66 +11,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   selector: 'app-job-detail',
   standalone: true,
   imports: [CommonModule, TerminalViewer, StatusBadge, MatProgressSpinnerModule],
-  template: `
-    @if (loading()) {
-      <div class="loading-state"><mat-spinner diameter="40"></mat-spinner></div>
-    } @else if (job()) {
-      <div class="job-header">
-        <div class="job-title">
-          <h2>Job #{{ job()!.id }}</h2>
-          <app-status-badge [status]="job()!.status"></app-status-badge>
-        </div>
-        <div class="job-meta">
-          <span>Started: {{ job()!.created_at | date:'medium' }}</span>
-        </div>
-      </div>
-      
-      <div class="terminal-wrapper">
-        <app-terminal-viewer #terminal></app-terminal-viewer>
-      </div>
-    } @else {
-      <div class="error-state">Job not found</div>
-    }
-  `,
-  styles: [`
-    :host {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    .loading-state, .error-state {
-      padding: 48px;
-      text-align: center;
-    }
-    .job-header {
-      margin-bottom: 16px;
-      padding: 16px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .job-title {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 8px;
-    }
-    .job-title h2 {
-      margin: 0;
-      color: #333;
-    }
-    .job-meta {
-      font-size: 14px;
-      color: #666;
-    }
-    .terminal-wrapper {
-      flex: 1;
-      min-height: 400px;
-      display: flex;
-      flex-direction: column;
-    }
-  `]
-})
+  templateUrl: './job-detail.html',
+  styleUrl: './job-detail.css',})
 export class JobDetail implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private playbookService = inject(PlaybookService);

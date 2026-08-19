@@ -1,1 +1,13 @@
-<p>sidebar works!</p>
+<div class="logo-container">
+      <mat-icon>terminal</mat-icon>
+    </div>
+    <mat-nav-list class="nav-list">
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Dashboard</span>
+      </a>
+      <a mat-list-item routerLink="/playbooks" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>library_books</mat-icon>
+        <span matListItemTitle>Playbooks</span>
+      </a>
+    </mat-nav-list>

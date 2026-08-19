@@ -1,1 +1,19 @@
-<p>job-detail works!</p>
+@if (loading()) {
+      <div class="loading-state"><mat-spinner diameter="40"></mat-spinner></div>
+    } @else if (job()) {
+      <div class="job-header">
+        <div class="job-title">
+          <h2>Job #{{ job()!.id }}</h2>
+          <app-status-badge [status]="job()!.status"></app-status-badge>
+        </div>
+        <div class="job-meta">
+          <span>Started: {{ job()!.created_at | date:'medium' }}</span>
+        </div>
+      </div>
+      
+      <div class="terminal-wrapper">
+        <app-terminal-viewer #terminal></app-terminal-viewer>
+      </div>
+    } @else {
+      <div class="error-state">Job not found</div>
+    }

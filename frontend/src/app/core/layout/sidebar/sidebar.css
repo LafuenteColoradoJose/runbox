@@ -1,0 +1,37 @@
+.logo-container {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .logo-container h2 {
+      margin: 0;
+      font-weight: 500;
+      font-size: 20px;
+      color: #fff;
+    }
+    .logo-container mat-icon {
+      color: #4caf50;
+    }
+    .nav-list {
+      padding-top: 10px;
+    }
+    .nav-list a {
+      color: rgba(255,255,255,0.7);
+    }
+    .nav-list a:hover {
+      background-color: rgba(255,255,255,0.05);
+      color: #fff;
+    }
+    .active-link {
+      background-color: rgba(255,255,255,0.1) !important;
+      color: #fff !important;
+      border-left: 4px solid #4caf50;
+    }
+    .active-link mat-icon {
+      color: #4caf50;
+    }
+    ::ng-deep .mat-mdc-list-item-icon {
+      color: inherit !important;
+    }
