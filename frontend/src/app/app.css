@@ -8,11 +8,12 @@
     }
     .app-sidenav {
       width: 250px;
-      background-color: #1e1e2d;
-      color: white;
+      background-color: var(--mat-sys-surface-container);
+      color: var(--mat-sys-on-surface);
+      border-right: 1px solid var(--mat-sys-outline-variant);
     }
     .app-content {
-      background-color: #f4f6f8;
+      background-color: var(--mat-sys-background);
     }
     .content-wrapper {
       padding: 24px;

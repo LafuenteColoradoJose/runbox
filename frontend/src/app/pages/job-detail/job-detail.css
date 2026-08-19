@@ -10,9 +10,9 @@
     .job-header {
       margin-bottom: 16px;
       padding: 16px;
-      background: white;
+      background: var(--mat-sys-surface-container);
       border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: 1px solid var(--mat-sys-outline-variant);
     }
     .job-title {
       display: flex;
@@ -22,11 +22,11 @@
     }
     .job-title h2 {
       margin: 0;
-      color: #333;
+      color: var(--mat-sys-on-surface);
     }
     .job-meta {
       font-size: 14px;
-      color: #666;
+      color: var(--mat-sys-on-surface-variant);
     }
     .terminal-wrapper {
       flex: 1;

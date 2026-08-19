@@ -1,6 +1,9 @@
 <mat-toolbar color="primary" class="navbar">
-      <span>Runbox</span>
+      <app-logo></app-logo>
       <span class="spacer"></span>
+      <button mat-icon-button (click)="toggleTheme()" title="Toggle Dark/Light Mode">
+        <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
       <button mat-icon-button>
         <mat-icon>account_circle</mat-icon>
       </button>
