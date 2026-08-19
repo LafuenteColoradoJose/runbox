@@ -1,0 +1,34 @@
+# 📖 Runbox: Manual de Usuario
+
+¡Bienvenido a **Runbox**! Tu interfaz gráfica moderna y ligera para la orquestación y automatización de infraestructuras IT mediante Ansible.
+
+Runbox está diseñado para simplificar las ejecuciones de los *Playbooks* de Ansible (archivos YAML con tareas de automatización) sin necesidad de tener conocimientos avanzados en la línea de comandos de Linux.
+
+---
+
+## 🚀 Requisitos Previos
+
+Para utilizar la herramienta, asegúrate de que Runbox esté en ejecución. El administrador del sistema puede proporcionarte una URL de acceso. 
+Si lo ejecutas localmente, necesitarás tener instalado **Docker**.
+
+---
+
+## 🌐 Uso de la Aplicación Web
+
+### 1. Navegación Principal
+Al entrar a Runbox, verás un menú lateral con las principales opciones. Por defecto, aterrizarás en el listado de **Playbooks**.
+
+### 2. Ejecución de un Playbook
+1. Ve a la sección **Playbooks**.
+2. Verás tarjetas (Cards) listando todas las automatizaciones disponibles (ej. *Dummy Playbook (Test)*, *Actualizar Servidores Web*).
+3. Haz clic en el botón de "Play" (Run) de color azul en la tarjeta deseada.
+4. El sistema creará un **Trabajo (Job)** y te redirigirá automáticamente a la pantalla de la consola.
+
+### 3. Visualización en Tiempo Real (Consola)
+Una vez en la vista de *Job Detail*, observarás una terminal negra clásica.
+- No necesitas recargar la página; verás el texto aparecer línea a línea, tal y como si estuvieras delante del servidor de forma nativa.
+- El sistema captura y te muestra tanto los procesos exitosos de Ansible como los posibles errores.
+- Verás un botón (Badge) en la parte superior que indica el estado del Job: `En ejecución`, `Completado` o `Fallido`.
+
+### 4. Consultar Ejecuciones Pasadas
+Si te vas de la pantalla o cierras la pestaña por error, no te preocupes. Todo el progreso queda guardado en la base de datos de manera persistente. Si vuelves a ingresar a la URL del trabajo, el log histórico se cargará inmediatamente desde donde se quedó.

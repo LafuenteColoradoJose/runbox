@@ -1,59 +1,28 @@
-# Frontend
+# Runbox Frontend (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.4.
+Este es el directorio del frontend de **Runbox**, construido con **Angular 22** y **Angular Material**.
 
-## Development server
+## Características Principales
 
-To start a local development server, run:
+*   **Arquitectura Moderna**: Uso de Standalone Components (sin `NgModules`).
+*   **Diseño**: Implementado utilizando componentes puramente de Material Design.
+*   **Terminal en Tiempo Real**: Uso de `xterm.js` con el aditamento `fit-addon`. Control de repintado optimizado a través de `requestAnimationFrame`.
+*   **Comunicación Websocket**: Se utiliza la librería `socket.io-client` para la recepción de streamings de `stdout` y `stderr` provenientes del orquestador Ansible.
 
-```bash
-ng serve
-```
+## Comandos de Desarrollo
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Para iniciar el servidor de desarrollo, desde la raíz del monorepo ejecuta:
 
 ```bash
-ng generate component component-name
+npm run start --workspace=frontend
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+La aplicación estará disponible en `http://localhost:4200/`. Cualquier cambio en el código recargará automáticamente la aplicación.
 
-```bash
-ng generate --help
-```
+## Estructura de Directorios
 
-## Building
+*   `src/app/core/`: Componentes estructurales (Sidenav, Toolbar) y servicios inyectables (Socket, Playbooks).
+*   `src/app/components/`: Componentes reutilizables de UI (Terminal, Tarjetas, Badges).
+*   `src/app/pages/`: Vistas completas que son manejadas por el Router de Angular.
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+> Nota: Consulta el `manual_tecnico.md` en la raíz del repositorio para obtener más información sobre el flujo de datos y la arquitectura global.
