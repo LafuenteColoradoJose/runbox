@@ -4,6 +4,7 @@
 
 Runbox está diseñado para simplificar las ejecuciones de los *Playbooks* de Ansible (archivos YAML con tareas de automatización) sin necesidad de tener conocimientos avanzados en la línea de comandos de Linux.
 
+Destaca por ofrecer una experiencia visual **Premium y Moderna** (basada en *Glassmorphism*, transiciones suaves y un entorno responsivo), garantizando además la máxima seguridad (por ejemplo, impidiendo volver atrás al Login una vez iniciada la sesión).
 ---
 
 ## 🚀 Requisitos Previos e Inicialización

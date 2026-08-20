@@ -1,0 +1,55 @@
+<div class="login-wrapper">
+  <!-- Dynamic Animated Background Shapes -->
+  <div class="bg-shape shape-1"></div>
+  <div class="bg-shape shape-2"></div>
+  <div class="bg-shape shape-3"></div>
+
+  <!-- Glassmorphism Login Card -->
+  <div class="glass-card">
+    <div class="logo-container">
+      <app-logo></app-logo>
+    </div>
+    
+    <div class="login-header">
+      <h2>Runbox</h2>
+      <p>Inicia sesión para continuar</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      @if (errorMessage()) {
+        <div class="error-message">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <mat-form-field appearance="outline" class="custom-field">
+        <mat-label>Usuario</mat-label>
+        <mat-icon matPrefix>person</mat-icon>
+        <input matInput formControlName="username" type="text" autocomplete="username" placeholder="ej: administrator">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="custom-field">
+        <mat-label>Contraseña</mat-label>
+        <mat-icon matPrefix>lock</mat-icon>
+        <input matInput formControlName="password" type="password" autocomplete="current-password" placeholder="Tu contraseña">
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button mat-flat-button color="primary" type="submit" class="submit-btn" [disabled]="loginForm.invalid || loading()">
+          @if (loading()) {
+            <mat-icon class="spinner">refresh</mat-icon>
+          }
+          @if (loading()) {
+            Iniciando...
+          } @else {
+            Entrar
+          }
+          @if (!loading()) {
+            <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

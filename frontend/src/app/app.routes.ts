@@ -1,8 +1,13 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth-guard';
+import { guestGuard } from './core/guards/guest-guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'playbooks', pathMatch: 'full' },
-  { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.Dashboard) },
-  { path: 'playbooks', loadComponent: () => import('./pages/playbooks/playbooks').then(m => m.Playbooks) },
-  { path: 'jobs/:id', loadComponent: () => import('./pages/job-detail/job-detail').then(m => m.JobDetail) }
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login), canActivate: [guestGuard] },
+  { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.Dashboard), canActivate: [authGuard] },
+  { path: 'playbooks', loadComponent: () => import('./pages/playbooks/playbooks').then(m => m.Playbooks), canActivate: [authGuard] },
+  { path: 'jobs/:id', loadComponent: () => import('./pages/job-detail/job-detail').then(m => m.JobDetail), canActivate: [authGuard] },
+  { path: 'profile', loadComponent: () => import('./pages/profile/profile').then(m => m.Profile), canActivate: [authGuard] },
+  { path: 'settings', loadComponent: () => import('./pages/settings/settings').then(m => m.Settings), canActivate: [authGuard] }
 ];

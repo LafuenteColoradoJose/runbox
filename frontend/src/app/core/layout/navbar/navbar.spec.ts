@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Navbar } from './navbar';
 import { DOCUMENT } from '@angular/common';
+import { provideRouter } from '@angular/router';
 
 describe('Navbar', () => {
   let component: Navbar;
@@ -23,7 +24,8 @@ describe('Navbar', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [Navbar]
+      imports: [Navbar],
+      providers: [provideRouter([])]
     }).compileComponents();
 
     fixture = TestBed.createComponent(Navbar);

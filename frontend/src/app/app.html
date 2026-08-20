@@ -1,11 +1,17 @@
-<app-navbar></app-navbar>
-    <mat-sidenav-container class="app-container">
-      <mat-sidenav mode="side" opened class="app-sidenav">
-        <app-sidebar></app-sidebar>
-      </mat-sidenav>
-      <mat-sidenav-content class="app-content">
-        <div class="content-wrapper">
-          <router-outlet></router-outlet>
-        </div>
-      </mat-sidenav-content>
-    </mat-sidenav-container>
+@if (authService.isAuthenticated()) {
+  <app-navbar></app-navbar>
+}
+
+<mat-sidenav-container class="sidenav-container" [style.height]="authService.isAuthenticated() ? 'calc(100vh - 64px)' : '100vh'">
+  @if (authService.isAuthenticated()) {
+    <mat-sidenav mode="side" opened class="sidenav">
+      <app-sidebar></app-sidebar>
+    </mat-sidenav>
+  }
+  
+  <mat-sidenav-content class="content">
+    <main class="main-content" [class.unauthenticated]="!authService.isAuthenticated()">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

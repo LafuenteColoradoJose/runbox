@@ -1,19 +1,25 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { Logo } from '../../../components/logo/logo';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [MatToolbarModule, MatIconModule, MatButtonModule, Logo],
+  imports: [RouterModule, MatToolbarModule, MatIconModule, MatButtonModule, MatMenuModule, MatDividerModule, Logo],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
 export class Navbar implements OnInit {
   isDarkMode = false;
+  private authService = inject(AuthService);
+  currentUser = this.authService.currentUser;
 
   constructor(@Inject(DOCUMENT) private document: Document) {}
 
@@ -35,5 +41,9 @@ export class Navbar implements OnInit {
       this.document.documentElement.classList.remove('dark-theme');
       this.document.documentElement.classList.add('light-theme');
     }
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }

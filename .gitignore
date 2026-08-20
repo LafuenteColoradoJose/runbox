@@ -7,3 +7,6 @@ backend/node_modules/
 .DS_Store
 *.log
 jobs.sqlite
+backend/*.db
+backend/coverage/
+backend/public/

@@ -2,7 +2,8 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-const dbPath = path.join(__dirname, 'runbox.db');
+const dbName = process.env.TEST_DB_NAME || (process.env.NODE_ENV === 'test' ? 'runbox.test.db' : 'runbox.db');
+const dbPath = path.join(__dirname, dbName);
 const db = new Database(dbPath);
 
 // Inicializar tablas
@@ -23,7 +24,26 @@ db.exec(`
     ended_at DATETIME,
     FOREIGN KEY(playbook_id) REFERENCES playbooks(id)
   );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    role TEXT DEFAULT 'user'
+  );
 `);
+
+// Sembrar el usuario administrador por defecto
+const userCountStmt = db.prepare('SELECT count(*) as count FROM users');
+const { count: userCount } = userCountStmt.get();
+if (userCount === 0) {
+  const bcrypt = require('bcryptjs');
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync('Usuario1.', salt);
+  const insertUser = db.prepare("INSERT INTO users (username, password, role) VALUES (?, ?, 'admin')");
+  insertUser.run('administrator', hash);
+}
+
 
 // Añadir playbook de prueba si no hay ninguno
 const countStmt = db.prepare('SELECT count(*) as count FROM playbooks');

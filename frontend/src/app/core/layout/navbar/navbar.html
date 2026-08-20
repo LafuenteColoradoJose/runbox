@@ -1,10 +1,39 @@
 <mat-toolbar color="primary" class="navbar">
-      <app-logo></app-logo>
-      <span class="spacer"></span>
-      <button mat-icon-button (click)="toggleTheme()" title="Toggle Dark/Light Mode">
-        <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  <a routerLink="/dashboard" class="logo-link">
+    <app-logo></app-logo>
+  </a>
+  <span class="spacer"></span>
+  
+  <button mat-icon-button (click)="toggleTheme()" title="Cambiar tema">
+    <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
+  @if (currentUser()) {
+    <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+      <div class="user-avatar">
+        {{ currentUser()?.username?.charAt(0)?.toUpperCase() }}
+      </div>
+      <span class="username">{{ currentUser()?.username }}</span>
+    </button>
+    
+    <mat-menu #userMenu="matMenu">
+      <div class="user-info-header">
+        <span class="user-role">{{ currentUser()?.role === 'admin' ? 'Administrador' : 'Usuario' }}</span>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item routerLink="/profile">
+        <mat-icon>person</mat-icon>
+        <span>Mi Perfil</span>
       </button>
-      <button mat-icon-button>
-        <mat-icon>account_circle</mat-icon>
+      <button mat-menu-item routerLink="/settings">
+        <mat-icon>settings</mat-icon>
+        <span>Ajustes</span>
       </button>
-    </mat-toolbar>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </mat-menu>
+  }
+</mat-toolbar>

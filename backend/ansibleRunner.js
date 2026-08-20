@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+const cp = require('child_process');
 const db = require('./db');
 
 function runPlaybook(playbookPath, io, jobId) {
@@ -6,7 +6,7 @@ function runPlaybook(playbookPath, io, jobId) {
     // Forzar colores de Ansible para que se vean bien en la terminal web
     const env = { ...process.env, PYTHONUNBUFFERED: '1', ANSIBLE_FORCE_COLOR: '1' };
     
-    const ansible = spawn('ansible-playbook', [playbookPath], { env });
+    const ansible = cp.spawn('ansible-playbook', [playbookPath], { env });
 
     const appendLog = db.prepare('UPDATE jobs SET log_output = log_output || ? WHERE id = ?');
 

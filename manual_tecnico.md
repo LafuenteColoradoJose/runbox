@@ -79,3 +79,13 @@ Detiene el ecosistema de forma ordenada mediante `pkill` (delimitado al usuario 
 1. Detiene el Frontend.
 2. Detiene el Backend local.
 3. Apaga el contenedor Docker.
+
+---
+
+## 🤖 Desarrollo impulsado por IA Agéntica (Agentic AI)
+
+Dado el paradigma actual donde la programación asistida por agentes autónomos de IA es un estándar en la industria, el desarrollo de **Runbox** se ha beneficiado enormemente del uso de "Skills" (habilidades) específicas para la IA. 
+
+En concreto, se han empleado las siguientes herramientas agénticas:
+*   **Skill de Angular**: Para asegurar que el código generado sigue las convenciones más modernas del framework (Angular 18+), componentes standalone, signal-based reactivity (Signals) y las mejores prácticas de inyección de dependencias.
+*   **Agent Skills de Addy Osmani** ([https://github.com/addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)): Una potente suite de habilidades que proporciona al agente de IA flujos de trabajo estructurados. Se ha utilizado para diseñar interfaces estables (API), revisión cruzada de código (*code review*), y desarrollo guiado por pruebas (*TDD*), garantizando así un código robusto, escalable y con una alta cobertura de tests.

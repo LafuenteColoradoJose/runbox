@@ -1,0 +1,85 @@
+<div class="settings-container">
+  <div class="header">
+    <h1>Ajustes de Runbox</h1>
+    <p>Configuración global de ejecución y notificaciones</p>
+  </div>
+
+  <mat-card class="settings-card">
+    <mat-tab-group animationDuration="0ms">
+      
+      <!-- Tab 1: Ejecución y Ansible -->
+      <mat-tab label="Ejecución de Playbooks">
+        <div class="tab-content">
+          <form [formGroup]="executionForm" (ngSubmit)="saveExecutionSettings()" class="settings-form">
+            <h3 class="section-title">Opciones por Defecto</h3>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Inventario por Defecto</mat-label>
+              <input matInput formControlName="defaultInventory" placeholder="/etc/ansible/hosts">
+              <mat-icon matSuffix>dns</mat-icon>
+              <mat-hint>Ruta absoluta al archivo de inventario en el servidor</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Timeout de Ejecución (segundos)</mat-label>
+              <input matInput type="number" formControlName="defaultTimeout">
+              <mat-icon matSuffix>timer</mat-icon>
+              <mat-hint>Tiempo máximo antes de cancelar un playbook</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Clave SSH por Defecto</mat-label>
+              <input matInput formControlName="defaultSshKey">
+              <mat-icon matSuffix>vpn_key</mat-icon>
+              <mat-hint>Ruta a la clave privada para conexión a los nodos</mat-hint>
+            </mat-form-field>
+
+            <div class="form-actions">
+              <button mat-flat-button color="primary" type="submit" [disabled]="executionForm.invalid">
+                Guardar Configuración
+              </button>
+            </div>
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 2: Notificaciones -->
+      <mat-tab label="Notificaciones">
+        <div class="tab-content">
+          <form [formGroup]="notificationsForm" (ngSubmit)="saveNotificationSettings()" class="settings-form">
+            <h3 class="section-title">Alertas del Sistema</h3>
+            
+            <div class="toggle-group">
+              <mat-slide-toggle formControlName="emailAlerts" color="primary">
+                Enviar alertas por correo en playbooks fallidos
+              </mat-slide-toggle>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <h3 class="section-title">Integraciones</h3>
+            
+            <div class="toggle-group">
+              <mat-slide-toggle formControlName="slackIntegration" color="primary">
+                Habilitar notificaciones en Slack/Teams (Webhook)
+              </mat-slide-toggle>
+            </div>
+
+            <mat-form-field appearance="outline" *ngIf="notificationsForm.get('slackIntegration')?.value">
+              <mat-label>URL del Webhook</mat-label>
+              <input matInput formControlName="webhookUrl" placeholder="https://hooks.slack.com/services/...">
+              <mat-icon matSuffix>link</mat-icon>
+            </mat-form-field>
+
+            <div class="form-actions">
+              <button mat-flat-button color="primary" type="submit">
+                Guardar Notificaciones
+              </button>
+            </div>
+          </form>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </mat-card>
+</div>
