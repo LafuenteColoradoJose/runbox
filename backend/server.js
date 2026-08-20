@@ -79,6 +79,34 @@ app.get('/api/jobs/:id', authMiddleware, (req, res) => {
   res.json(job);
 });
 
+// Obtener estadísticas del dashboard
+app.get('/api/dashboard/stats', authMiddleware, (req, res) => {
+  try {
+    const totalPlaybooks = db.prepare('SELECT count(*) as count FROM playbooks').get().count;
+    const totalJobs = db.prepare('SELECT count(*) as count FROM jobs').get().count;
+    const failedJobs = db.prepare('SELECT count(*) as count FROM jobs WHERE status = \'failed\'').get().count;
+    
+    // Obtener últimos 5 trabajos con el nombre de su playbook
+    const recentJobs = db.prepare(`
+      SELECT jobs.id, jobs.status, jobs.started_at, playbooks.name as playbook_name 
+      FROM jobs 
+      JOIN playbooks ON jobs.playbook_id = playbooks.id 
+      ORDER BY jobs.started_at DESC 
+      LIMIT 5
+    `).all();
+
+    res.json({
+      totalPlaybooks,
+      totalJobs,
+      failedJobs,
+      recentJobs
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    res.status(500).json({ error: 'Error interno del servidor al obtener estadísticas' });
+  }
+});
+
 // Sirve archivos estáticos (Para Docker / Producción)
 const publicPath = path.join(__dirname, 'public');
 app.use(express.static(publicPath));

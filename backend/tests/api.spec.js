@@ -99,4 +99,24 @@ describe('API Endpoints', () => {
       expect(jobResponse.body).toHaveProperty('playbook_id', playbookId);
     });
   });
+
+  describe('GET /api/dashboard/stats', () => {
+    it('should return 401 if no token provided', async () => {
+      const response = await request(app).get('/api/dashboard/stats');
+      expect(response.status).toBe(401);
+    });
+
+    it('should return dashboard stats when authenticated', async () => {
+      const response = await request(app)
+        .get('/api/dashboard/stats')
+        .set('Authorization', `Bearer ${token}`);
+      
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('totalPlaybooks');
+      expect(response.body).toHaveProperty('totalJobs');
+      expect(response.body).toHaveProperty('failedJobs');
+      expect(response.body).toHaveProperty('recentJobs');
+      expect(Array.isArray(response.body.recentJobs)).toBe(true);
+    });
+  });
 });
