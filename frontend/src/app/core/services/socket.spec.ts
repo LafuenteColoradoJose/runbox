@@ -10,7 +10,7 @@ const mockSocket = {
 
 vi.mock('socket.io-client', () => {
   return {
-    io: vi.fn(() => mockSocket)
+    io: vi.fn().mockImplementation(() => mockSocket)
   };
 });
 
