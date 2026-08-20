@@ -21,26 +21,30 @@ export class Playbooks implements OnInit {
   playbooks = signal<Playbook[]>([]);
   loading = signal<boolean>(true);
 
-  async ngOnInit() {
-    try {
-      const data = await this.playbookService.getPlaybooks();
-      this.playbooks.set(data);
-    } catch (err) {
-      console.error('Error fetching playbooks', err);
-      this.snackBar.open('Error al cargar playbooks', 'Cerrar', { duration: 3000 });
-    } finally {
-      this.loading.set(false);
-    }
+  ngOnInit() {
+    this.playbookService.getPlaybooks().subscribe({
+      next: (data) => {
+        this.playbooks.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching playbooks', err);
+        this.snackBar.open('Error al cargar playbooks', 'Cerrar', { duration: 3000 });
+        this.loading.set(false);
+      }
+    });
   }
 
-  async runPlaybook(playbook: Playbook) {
-    try {
-      this.snackBar.open('Iniciando ' + playbook.name + '...', '', { duration: 1500 });
-      const job = await this.playbookService.runPlaybook(playbook.id);
-      this.router.navigate(['/jobs', job.id]);
-    } catch (err) {
-      console.error('Error running playbook', err);
-      this.snackBar.open('Error al ejecutar playbook', 'Cerrar', { duration: 3000 });
-    }
+  runPlaybook(playbook: Playbook) {
+    this.snackBar.open('Iniciando ' + playbook.name + '...', '', { duration: 1500 });
+    this.playbookService.runPlaybook(playbook.id).subscribe({
+      next: (res) => {
+        this.router.navigate(['/jobs', res.job.id]);
+      },
+      error: (err) => {
+        console.error('Error running playbook', err);
+        this.snackBar.open('Error al ejecutar playbook', 'Cerrar', { duration: 3000 });
+      }
+    });
   }
 }

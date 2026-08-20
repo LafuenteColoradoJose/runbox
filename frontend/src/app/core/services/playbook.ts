@@ -1,4 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Playbook {
   id: number;
@@ -19,25 +22,19 @@ export interface Job {
 
 @Injectable({ providedIn: 'root' })
 export class PlaybookService {
-  private apiUrl = location.port === '4200' ? 'http://localhost:3000/api' : '/api';
+  private http = inject(HttpClient);
+  // Usa variable de entorno, con fallback para que no rompa
+  private apiUrl = (typeof environment !== 'undefined' && environment.apiUrl) ? environment.apiUrl : 'http://localhost:3000/api';
 
-  async getPlaybooks(): Promise<Playbook[]> {
-    const res = await fetch(`${this.apiUrl}/playbooks`);
-    return res.json();
+  getPlaybooks(): Observable<Playbook[]> {
+    return this.http.get<Playbook[]>(`${this.apiUrl}/playbooks`);
   }
 
-  async runPlaybook(playbookId: number): Promise<Job> {
-    const res = await fetch(`${this.apiUrl}/playbooks/run`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: playbookId })
-    });
-    const data = await res.json();
-    return data.job;
+  runPlaybook(playbookId: number): Observable<{ message: string, job: { id: number } }> {
+    return this.http.post<{ message: string, job: { id: number } }>(`${this.apiUrl}/playbooks/run`, { id: playbookId });
   }
 
-  async getJob(jobId: number): Promise<Job> {
-    const res = await fetch(`${this.apiUrl}/jobs/${jobId}`);
-    return res.json();
+  getJob(jobId: number): Observable<Job> {
+    return this.http.get<Job>(`${this.apiUrl}/jobs/${jobId}`);
   }
 }

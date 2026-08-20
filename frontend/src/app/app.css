@@ -1,22 +1,39 @@
 :host {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    .app-container {
-      flex: 1;
-    }
-    .app-sidenav {
-      width: 250px;
-      background-color: var(--mat-sys-surface-container);
-      color: var(--mat-sys-on-surface);
-      border-right: 1px solid var(--mat-sys-outline-variant);
-    }
-    .app-content {
-      background-color: var(--mat-sys-background);
-    }
-    .content-wrapper {
-      padding: 24px;
-      height: calc(100% - 48px);
-      box-sizing: border-box;
-    }
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.sidenav-container {
+  flex: 1;
+  background-color: var(--mat-sys-background);
+}
+
+.sidenav {
+  width: 250px;
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+  border-right: 1px solid var(--mat-sys-outline-variant);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 24px;
+}
+
+.main-content.unauthenticated {
+  padding: 0;
+}

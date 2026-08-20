@@ -24,37 +24,39 @@ export class JobDetail implements OnInit, OnDestroy {
   job = signal<Job | null>(null);
   loading = signal<boolean>(true);
 
-  async ngOnInit() {
+  ngOnInit() {
     this.jobId = Number(this.route.snapshot.paramMap.get('id'));
     if (!this.jobId) return;
 
-    try {
-      const data = await this.playbookService.getJob(this.jobId);
-      this.job.set(data);
+    this.playbookService.getJob(this.jobId).subscribe({
+      next: (data) => {
+        this.job.set(data);
 
-      setTimeout(() => {
-        if (this.terminal && data.log_output) {
-          this.terminal.write(data.log_output);
-        }
-        
-        // Listen to active logs if it's still running
-        if (data.status === 'running' || data.status === 'pending') {
-          this.socketService.listenToJob(this.jobId, (log) => {
-            if (this.terminal) {
-              this.terminal.write(log.data);
-            }
-          });
+        setTimeout(() => {
+          if (this.terminal && data.log_output) {
+            this.terminal.write(data.log_output);
+          }
+          
+          // Listen to active logs if it's still running
+          if (data.status === 'running' || data.status === 'pending') {
+            this.socketService.listenToJob(this.jobId, (log) => {
+              if (this.terminal) {
+                this.terminal.write(log.data);
+              }
+            });
 
-          this.socketService.listenToJobStatus(this.jobId, (statusData) => {
-            this.job.update(j => j ? { ...j, status: statusData.status } : null);
-          });
-        }
-      }, 100);
-    } catch (err) {
-      console.error('Failed to load job', err);
-    } finally {
-      this.loading.set(false);
-    }
+            this.socketService.listenToJobStatus(this.jobId, (statusData) => {
+              this.job.update(j => j ? { ...j, status: statusData.status } : null);
+            });
+          }
+        }, 100);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load job', err);
+        this.loading.set(false);
+      }
+    });
   }
 
   ngOnDestroy() {

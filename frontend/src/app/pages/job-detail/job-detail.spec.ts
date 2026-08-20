@@ -3,6 +3,7 @@ import { JobDetail } from './job-detail';
 import { PlaybookService } from '../../core/services/playbook';
 import { SocketService } from '../../core/services/socket';
 import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 describe('JobDetail', () => {
   let component: JobDetail;
@@ -13,9 +14,9 @@ describe('JobDetail', () => {
 
   beforeEach(async () => {
     mockPlaybookService = {
-      getJob: vi.fn().mockResolvedValue({
+      getJob: vi.fn().mockReturnValue(of({
         id: 1, playbook_id: 1, status: 'running', log_output: 'Starting...', created_at: '', updated_at: ''
-      })
+      }))
     };
 
     mockSocketService = {
@@ -63,7 +64,7 @@ describe('JobDetail', () => {
 
     fixture = TestBed.createComponent(JobDetail);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should create and fetch job', () => {

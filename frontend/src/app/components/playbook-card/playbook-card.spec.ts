@@ -23,8 +23,8 @@ describe('PlaybookCard', () => {
     component = fixture.componentInstance;
     
     // Set required input
-    component.playbook = mockPlaybook;
-    await fixture.whenStable();
+    fixture.componentRef.setInput('playbook', mockPlaybook);
+    fixture.detectChanges();
   });
 
   it('should create', () => {

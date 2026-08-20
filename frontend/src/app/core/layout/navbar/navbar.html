@@ -10,10 +10,12 @@
 
   @if (currentUser()) {
     <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
-      <div class="user-avatar">
-        {{ currentUser()?.username?.charAt(0)?.toUpperCase() }}
+      <div class="user-menu-content">
+        <div class="user-avatar">
+          {{ currentUser()?.username?.charAt(0)?.toUpperCase() }}
+        </div>
+        <span class="username">{{ currentUser()?.username }}</span>
       </div>
-      <span class="username">{{ currentUser()?.username }}</span>
     </button>
     
     <mat-menu #userMenu="matMenu">

@@ -1,8 +1,9 @@
 :host {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
     .loading-state, .error-state {
       padding: 48px;
       text-align: center;
@@ -29,8 +30,8 @@
       color: var(--mat-sys-on-surface-variant);
     }
     .terminal-wrapper {
-      flex: 1;
-      min-height: 400px;
-      display: flex;
-      flex-direction: column;
-    }
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}

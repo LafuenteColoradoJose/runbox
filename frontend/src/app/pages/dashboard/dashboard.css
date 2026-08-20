@@ -1,5 +1,4 @@
 .dashboard-container {
-  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -20,14 +19,12 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
-  background: linear-gradient(135deg, var(--text-color) 0%, rgba(255,255,255,0.7) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--mat-sys-on-surface);
 }
 
 .header-content p {
   font-size: 1.1rem;
-  color: var(--text-secondary);
+  color: var(--mat-sys-on-surface-variant);
   margin: 0;
 }
 
@@ -35,8 +32,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--primary-color);
-  color: white;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
   padding: 0.8rem 1.5rem;
   border-radius: 8px;
   text-decoration: none;
@@ -105,7 +102,7 @@
 
 .stat-label {
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--mat-sys-on-surface-variant);
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -139,7 +136,7 @@
 }
 
 .view-all-link {
-  color: var(--primary-color);
+  color: var(--mat-sys-primary);
   text-decoration: none;
   font-weight: 500;
   font-size: 0.9rem;
@@ -163,7 +160,7 @@
 .jobs-table th {
   text-align: left;
   padding: 0.5rem 1rem;
-  color: var(--text-secondary);
+  color: var(--mat-sys-on-surface-variant);
   font-size: 0.9rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -191,7 +188,7 @@
 
 .job-id {
   font-family: monospace;
-  color: var(--text-secondary);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .job-name {
@@ -199,7 +196,7 @@
 }
 
 .job-date {
-  color: var(--text-secondary);
+  color: var(--mat-sys-on-surface-variant);
   font-size: 0.9rem;
 }
 
@@ -227,14 +224,14 @@
   justify-content: center;
   padding: 4rem;
   gap: 1rem;
-  color: var(--text-secondary);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: var(--primary-color);
+  border-left-color: var(--mat-sys-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
