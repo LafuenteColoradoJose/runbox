@@ -1,42 +1,42 @@
 <div class="settings-container">
   <div class="header">
-    <h1>Ajustes de Runbox</h1>
-    <p>Configuración global de ejecución y notificaciones</p>
+    <h1>Runbox Settings</h1>
+    <p>Global execution and notification configuration</p>
   </div>
 
   <mat-card class="settings-card">
     <mat-tab-group animationDuration="0ms">
       
       <!-- Tab 1: Ejecución y Ansible -->
-      <mat-tab label="Ejecución de Playbooks">
+      <mat-tab label="Playbook Execution">
         <div class="tab-content">
           <form [formGroup]="executionForm" (ngSubmit)="saveExecutionSettings()" class="settings-form">
-            <h3 class="section-title">Opciones por Defecto</h3>
+            <h3 class="section-title">Default Options</h3>
             
             <mat-form-field appearance="outline">
-              <mat-label>Inventario por Defecto</mat-label>
+              <mat-label>Default Inventory</mat-label>
               <input matInput formControlName="defaultInventory" placeholder="/etc/ansible/hosts">
               <mat-icon matSuffix>dns</mat-icon>
-              <mat-hint>Ruta absoluta al archivo de inventario en el servidor</mat-hint>
+              <mat-hint>Absolute path to the inventory file on the server</mat-hint>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Timeout de Ejecución (segundos)</mat-label>
+              <mat-label>Execution Timeout (seconds)</mat-label>
               <input matInput type="number" formControlName="defaultTimeout">
               <mat-icon matSuffix>timer</mat-icon>
-              <mat-hint>Tiempo máximo antes de cancelar un playbook</mat-hint>
+              <mat-hint>Maximum time before canceling a playbook</mat-hint>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Clave SSH por Defecto</mat-label>
+              <mat-label>Default SSH Key</mat-label>
               <input matInput formControlName="defaultSshKey">
               <mat-icon matSuffix>vpn_key</mat-icon>
-              <mat-hint>Ruta a la clave privada para conexión a los nodos</mat-hint>
+              <mat-hint>Path to the private key for connecting to nodes</mat-hint>
             </mat-form-field>
 
             <div class="form-actions">
               <button mat-flat-button color="primary" type="submit" [disabled]="executionForm.invalid">
-                Guardar Configuración
+                Save Configuration
               </button>
             </div>
           </form>
@@ -44,36 +44,38 @@
       </mat-tab>
 
       <!-- Tab 2: Notificaciones -->
-      <mat-tab label="Notificaciones">
+      <mat-tab label="Notifications">
         <div class="tab-content">
           <form [formGroup]="notificationsForm" (ngSubmit)="saveNotificationSettings()" class="settings-form">
-            <h3 class="section-title">Alertas del Sistema</h3>
+            <h3 class="section-title">System Alerts</h3>
             
             <div class="toggle-group">
               <mat-slide-toggle formControlName="emailAlerts" color="primary">
-                Enviar alertas por correo en playbooks fallidos
+                Send email alerts for failed playbooks
               </mat-slide-toggle>
             </div>
 
             <mat-divider></mat-divider>
 
-            <h3 class="section-title">Integraciones</h3>
+            <h3 class="section-title">Integrations</h3>
             
             <div class="toggle-group">
               <mat-slide-toggle formControlName="slackIntegration" color="primary">
-                Habilitar notificaciones en Slack/Teams (Webhook)
+                Enable Slack/Teams notifications (Webhook)
               </mat-slide-toggle>
             </div>
 
-            <mat-form-field appearance="outline" *ngIf="notificationsForm.get('slackIntegration')?.value">
-              <mat-label>URL del Webhook</mat-label>
-              <input matInput formControlName="webhookUrl" placeholder="https://hooks.slack.com/services/...">
-              <mat-icon matSuffix>link</mat-icon>
-            </mat-form-field>
+            @if (notificationsForm.get('slackIntegration')?.value) {
+              <mat-form-field appearance="outline">
+                <mat-label>Webhook URL</mat-label>
+                <input matInput formControlName="webhookUrl" placeholder="https://hooks.slack.com/services/...">
+                <mat-icon matSuffix>link</mat-icon>
+              </mat-form-field>
+            }
 
             <div class="form-actions">
               <button mat-flat-button color="primary" type="submit">
-                Guardar Notificaciones
+                Save Notifications
               </button>
             </div>
           </form>

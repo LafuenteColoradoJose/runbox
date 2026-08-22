@@ -1,2 +1,16 @@
 @import '@xterm/xterm/css/xterm.css';
 html, body { height: 100%; margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Global Dialog Form Styles replacing Tailwind */
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+/* Workaround for Angular Material outline notch overlapping label in modals */
+.mdc-notched-outline__notch {
+  width: auto !important;
+  padding-right: 8px !important;
+}

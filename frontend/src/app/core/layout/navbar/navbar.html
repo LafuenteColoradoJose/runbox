@@ -4,7 +4,7 @@
   </a>
   <span class="spacer"></span>
   
-  <button mat-icon-button (click)="toggleTheme()" title="Cambiar tema">
+  <button mat-icon-button (click)="toggleTheme()" title="Toggle theme">
     <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
   </button>
 
@@ -20,21 +20,21 @@
     
     <mat-menu #userMenu="matMenu">
       <div class="user-info-header">
-        <span class="user-role">{{ currentUser()?.role === 'admin' ? 'Administrador' : 'Usuario' }}</span>
+        <span class="user-role">{{ currentUser()?.role === 'admin' ? 'Administrator' : 'User' }}</span>
       </div>
       <mat-divider></mat-divider>
       <button mat-menu-item routerLink="/profile">
         <mat-icon>person</mat-icon>
-        <span>Mi Perfil</span>
+        <span>My Profile</span>
       </button>
       <button mat-menu-item routerLink="/settings">
         <mat-icon>settings</mat-icon>
-        <span>Ajustes</span>
+        <span>Settings</span>
       </button>
       <mat-divider></mat-divider>
       <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
-        <span>Cerrar sesión</span>
+        <span>Logout</span>
       </button>
     </mat-menu>
   }

@@ -1,6 +1,8 @@
 @use '@angular/material' as mat;
 @use './theme-colors' as theme;
 
+@include mat.core();
+
 html {
   // Use light dark scheme to respect OS setting if no class is present
   color-scheme: light dark;

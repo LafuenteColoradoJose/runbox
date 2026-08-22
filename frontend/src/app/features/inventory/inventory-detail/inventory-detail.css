@@ -1,0 +1,143 @@
+.inv-detail-container {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-color);
+  box-sizing: border-box;
+}
+
+.inv-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.inv-detail-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.breadcrumb-link {
+  color: var(--primary-color, #1976d2);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-separator {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.breadcrumb-current {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.inv-detail-content {
+  flex: 1;
+  background-color: var(--surface-color);
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.action-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-right {
+  text-align: right;
+  white-space: nowrap; overflow: visible; text-overflow: clip; min-width: 120px;
+}
+
+.small-chip {
+  font-size: 12px;
+  min-height: 24px;
+}
+
+.table-row {
+  transition: background-color 0.2s;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-row:hover {
+  background-color: var(--hover-bg);
+}
+
+.empty-state {
+  padding: 32px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.topology-wrapper {
+  padding: 16px;
+  height: 600px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.topology-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.topology-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}

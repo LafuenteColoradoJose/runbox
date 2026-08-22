@@ -2,12 +2,12 @@
   <!-- Header -->
   <header class="dashboard-header">
     <div class="header-content">
-      <h1>Hola, {{ currentUser()?.username || 'Usuario' }} 👋</h1>
-      <p>Bienvenido de nuevo a tu orquestador. Aquí tienes un resumen de tu entorno.</p>
+      <h1>Hello, {{ currentUser()?.username || 'User' }} 👋</h1>
+      <p>Welcome back to your orchestrator. Here is a summary of your environment.</p>
     </div>
     <div class="header-actions">
       <a routerLink="/playbooks" class="btn-primary">
-        <span class="icon">🚀</span> Lanzar Playbook
+        <span class="icon">🚀</span> Launch Playbook
       </a>
     </div>
   </header>
@@ -20,7 +20,7 @@
           <span>📚</span>
         </div>
         <div class="stat-content">
-          <p class="stat-label">Playbooks Disponibles</p>
+          <p class="stat-label">Available Playbooks</p>
           <h2 class="stat-value">{{ s.totalPlaybooks }}</h2>
         </div>
       </div>
@@ -30,7 +30,7 @@
           <span>⚙️</span>
         </div>
         <div class="stat-content">
-          <p class="stat-label">Ejecuciones Totales</p>
+          <p class="stat-label">Total Executions</p>
           <h2 class="stat-value">{{ s.totalJobs }}</h2>
         </div>
       </div>
@@ -40,7 +40,7 @@
           <span>⚠️</span>
         </div>
         <div class="stat-content">
-          <p class="stat-label">Tareas Fallidas</p>
+          <p class="stat-label">Failed Jobs</p>
           <h2 class="stat-value">{{ s.failedJobs }}</h2>
         </div>
       </div>
@@ -49,14 +49,14 @@
     <!-- Recent Jobs Table -->
     <div class="recent-jobs glass-panel">
       <div class="panel-header">
-        <h2>Ejecuciones Recientes</h2>
-        <a routerLink="/playbooks" class="view-all-link">Ver todas →</a>
+        <h2>Recent Executions</h2>
+        <a routerLink="/playbooks" class="view-all-link">View all →</a>
       </div>
       
       <div class="table-responsive">
         @if (s.recentJobs.length === 0) {
           <div class="empty-state">
-            <p>No hay ejecuciones recientes.</p>
+            <p>No recent executions found.</p>
           </div>
         } @else {
           <table class="jobs-table">
@@ -64,9 +64,9 @@
               <tr>
                 <th>ID</th>
                 <th>Playbook</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Acción</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -79,7 +79,7 @@
                   </td>
                   <td class="job-date">{{ job.started_at | date:'short' }}</td>
                   <td>
-                    <a [routerLink]="['/jobs', job.id]" class="btn-icon" title="Ver logs">
+                    <a [routerLink]="['/jobs', job.id]" class="btn-icon" title="View logs">
                       👁️
                     </a>
                   </td>
@@ -93,7 +93,7 @@
   } @else {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Cargando métricas...</p>
+      <p>Loading metrics...</p>
     </div>
   }
 </div>

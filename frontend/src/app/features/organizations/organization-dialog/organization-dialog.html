@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>{{ data ? 'Edit Organization' : 'New Organization' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="orgForm" class="dialog-form">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="E.g., Default">
+      @if (orgForm.get('name')?.hasError('required')) {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-flat-button color="primary" [disabled]="orgForm.invalid" (click)="save()">Save</button>
+</mat-dialog-actions>

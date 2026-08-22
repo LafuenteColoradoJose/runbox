@@ -1,0 +1,51 @@
+# Runbox
+
+**Runbox** es una plataforma de desarrollo interno (Internal Developer Platform - IDP) ligera que facilita y democratiza la ejecución de Infraestructura como Código (IaC). Permite organizar y operar entornos, automatizaciones y playbooks mediante un portal web intuitivo y de autoservicio.
+
+Este proyecto ha sido desarrollado con una arquitectura robusta orientada a un entorno empresarial:
+- **Backend:** Node.js, Express, Better-SQLite3
+- **Frontend:** Angular 19, Material Design, ECharts (Topología de redes)
+
+> [!NOTE]
+> **Credenciales de Acceso (Pruebas Locales):**
+> Para probar la aplicación, utiliza el usuario `administrator` y la contraseña `Usuario1.`
+
+---
+
+## 📚 Documentación
+
+En este repositorio se encuentran los manuales completos del proyecto:
+
+1. **[Manual de Usuario](./manual_de_usuario.md)**
+   Toda la información orientada al usuario final, sobre cómo navegar, usar la interfaz, crear inventarios, organizaciones, etc.
+
+2. **[Manual Técnico](./manual_tecnico.md)**
+   Información profunda para desarrolladores, arquitectura del sistema, estructura de la base de datos, APIs y cómo compilar/ejecutar el proyecto localmente.
+
+---
+
+## 🏢 Arquitectura y Jerarquía de Inventarios
+
+Runbox utiliza un modelo jerárquico estándar en la industria para organizar la infraestructura, diseñado para el control de acceso granular (RBAC):
+
+1. **Organización:** El contenedor principal (Ej. departamentos como *Ventas* o *RRHH*).
+2. **Inventario:** El entorno de trabajo aislado (Ej. *Datacenter Producción* o *Nube AWS*).
+3. **Grupos y Hosts:** Los equipos individuales y las agrupaciones lógicas, los cuales pueden tener asociadas **Variables (JSON)** profesionales que hereda la infraestructura inferior.
+
+---
+
+## 🚀 Despliegue y Ejecución Rápida
+
+El proyecto cuenta con scripts bash para facilitar su gestión local en modo demonio (usando `pm2`):
+
+- **Arrancar el entorno (Frontend + Backend):**
+  ```bash
+  ./start.sh
+  ```
+- **Detener el entorno:**
+  ```bash
+  ./stop.sh
+  ```
+
+---
+*Desarrollado para demostrar capacidades avanzadas en arquitectura web y gestión de inventarios.*

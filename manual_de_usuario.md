@@ -4,7 +4,23 @@
 
 Runbox está diseñado para simplificar las ejecuciones de los *Playbooks* de Ansible (archivos YAML con tareas de automatización) sin necesidad de tener conocimientos avanzados en la línea de comandos de Linux.
 
+> [!NOTE]
+> **Credenciales de Acceso (Pruebas Locales):**
+> Para acceder al portal, utiliza el usuario `administrator` y la contraseña `Usuario1.`
+
 Destaca por ofrecer una experiencia visual **Premium y Moderna** (basada en *Glassmorphism*, transiciones suaves y un entorno responsivo), garantizando además la máxima seguridad (por ejemplo, impidiendo volver atrás al Login una vez iniciada la sesión).
+---
+
+## 🏢 Arquitectura y Jerarquía de Inventarios
+
+Runbox utiliza un modelo jerárquico para organizar la infraestructura de forma clara:
+
+1. **Organización:** El contenedor principal. Por ejemplo, departamentos como *Ventas* o *RRHH*.
+2. **Inventario:** El entorno de trabajo asociado a una organización (Ej. *Datacenter Producción*).
+3. **Grupos y Hosts:** Los equipos individuales agrupados lógicamente, que pueden contener variables de entorno o conexión.
+
+*(Nota: Puedes encontrar más detalles técnicos sobre esta estructura en el [Manual Técnico](./manual_tecnico.md) y en el [README](./README.md)).*
+
 ---
 
 ## 🚀 Requisitos Previos e Inicialización

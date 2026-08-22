@@ -2,6 +2,10 @@
 
 Este documento describe la arquitectura técnica, las decisiones de diseño y las instrucciones de despliegue del proyecto **Runbox** (Orquestador estilo Ansible AWX / Semaphore UI).
 
+> [!NOTE]
+> **Credenciales de Acceso (Pruebas Locales):**
+> Los seeds de la base de datos de SQLite configuran por defecto el usuario `administrator` con la contraseña `Usuario1.` para realizar pruebas.
+
 ## 🏗️ Arquitectura General
 
 El proyecto utiliza una arquitectura basada en un **Monorepo** con NPM Workspaces que divide la aplicación en dos grandes módulos: `frontend` y `backend`.
@@ -11,6 +15,17 @@ El proyecto utiliza una arquitectura basada en un **Monorepo** con NPM Workspace
 *   **Backend**: Node.js v22, Express, Socket.io, better-sqlite3.
 *   **Sistema y Orquestación**: Ansible, SSHPass.
 *   **Infraestructura**: Docker (Multistage Build).
+
+---
+
+## 🏢 Arquitectura y Jerarquía de Inventarios
+
+El modelo de datos relacional refleja una jerarquía estándar para plataformas de automatización, optimizada para control de accesos basado en roles (RBAC) y la herencia de variables:
+
+1. **Organizations (`organizations`)**: El nivel superior (Ej. departamentos como *Ventas* o *RRHH*).
+2. **Inventories (`inventories`)**: Agrupaciones de infraestructura pertenecientes a una organización (Ej. *AWS Production*).
+3. **Groups (`groups`)**: Agrupaciones lógicas de hosts (Ej. *web_servers*). Pueden almacenar variables compartidas en formato JSON.
+4. **Hosts (`hosts`)**: Máquinas finales gestionadas por Ansible, asociadas a uno o más grupos (`host_groups`). También soportan variables JSON individuales.
 
 ---
 

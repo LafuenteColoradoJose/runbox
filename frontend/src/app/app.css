@@ -10,10 +10,17 @@
 }
 
 .sidenav {
-  width: 250px;
+  width: 65px;
   background-color: var(--mat-sys-surface-container);
   color: var(--mat-sys-on-surface);
   border-right: 1px solid var(--mat-sys-outline-variant);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-x: hidden;
+  white-space: nowrap;
+}
+
+.sidenav:hover {
+  width: 250px;
 }
 
 .content {
