@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,15 +12,22 @@ import { InventoryDialog } from './inventory-dialog/inventory-dialog';
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, MatChipsModule, MatDialogModule, RouterModule],
+  imports: [
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatDialogModule,
+    RouterModule,
+  ],
   templateUrl: './inventory.component.html',
-  styleUrl: './inventory.component.css'
+  styleUrl: './inventory.component.css',
 })
 export class InventoryComponent implements OnInit {
   private inventoryService = inject(InventoryService);
   private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
-  
+
   inventories: Inventory[] = [];
   displayedColumns: string[] = ['name', 'organization', 'actions'];
 
@@ -29,7 +36,7 @@ export class InventoryComponent implements OnInit {
   }
 
   loadInventories() {
-    this.inventoryService.getInventories().subscribe(data => {
+    this.inventoryService.getInventories().subscribe((data) => {
       this.inventories = data;
       this.cdr.markForCheck();
     });
@@ -38,10 +45,10 @@ export class InventoryComponent implements OnInit {
   openDialog(inv?: Inventory) {
     const dialogRef = this.dialog.open(InventoryDialog, {
       width: '400px',
-      data: inv
+      data: inv,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) this.loadInventories();
     });
   }

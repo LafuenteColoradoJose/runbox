@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
@@ -18,12 +18,17 @@ import { GroupDialog } from '../group-dialog/group-dialog';
   selector: 'app-inventory-detail',
   standalone: true,
   imports: [
-    CommonModule, RouterModule, MatTabsModule, MatTableModule, 
-    MatButtonModule, MatIconModule, MatChipsModule, MatDialogModule,
-    NgxEchartsDirective
+    RouterModule,
+    MatTabsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatDialogModule,
+    NgxEchartsDirective,
   ],
   templateUrl: './inventory-detail.html',
-  styleUrl: './inventory-detail.css'
+  styleUrl: './inventory-detail.css',
 })
 export class InventoryDetail implements OnInit {
   private route = inject(ActivatedRoute);
@@ -33,7 +38,7 @@ export class InventoryDetail implements OnInit {
 
   inventoryId!: number;
   inventory?: Inventory;
-  
+
   hosts: Host[] = [];
   groups: Group[] = [];
   chartOption: EChartsOption = {};
@@ -42,14 +47,14 @@ export class InventoryDetail implements OnInit {
   groupColumns: string[] = ['id', 'name', 'actions'];
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       this.inventoryId = Number(params.get('id'));
       this.loadAll();
     });
   }
 
   loadAll() {
-    this.inventoryService.getInventory(this.inventoryId).subscribe(data => {
+    this.inventoryService.getInventory(this.inventoryId).subscribe((data) => {
       this.inventory = data;
       this.cdr.markForCheck();
     });
@@ -59,46 +64,53 @@ export class InventoryDetail implements OnInit {
   }
 
   loadHosts() {
-    this.inventoryService.getHostsByInventory(this.inventoryId).subscribe(data => {
+    this.inventoryService.getHostsByInventory(this.inventoryId).subscribe((data) => {
       this.hosts = data;
       this.cdr.markForCheck();
     });
   }
 
   loadGroups() {
-    this.inventoryService.getGroupsByInventory(this.inventoryId).subscribe(data => {
+    this.inventoryService.getGroupsByInventory(this.inventoryId).subscribe((data) => {
       this.groups = data;
       this.cdr.markForCheck();
     });
   }
 
   loadTopology() {
-    this.inventoryService.getTopologyByInventory(this.inventoryId).subscribe(data => {
+    this.inventoryService.getTopologyByInventory(this.inventoryId).subscribe((data) => {
       // Tree Graph (Topology tab)
-      const rootNode = data.nodes.find(n => n.category === 0);
+      const rootNode = data.nodes.find((n) => n.category === 0);
       if (rootNode) {
         const buildTree = (nodeId: string, nodeName: string, category: number): any => {
           // Find all links where source is current node
-          const childrenLinks = data.links.filter(l => l.source === nodeId);
+          const childrenLinks = data.links.filter((l) => l.source === nodeId);
           const children = childrenLinks
-            .map(l => {
-              const childNode = data.nodes.find(n => n.id === l.target);
+            .map((l) => {
+              const childNode = data.nodes.find((n) => n.id === l.target);
               return childNode ? buildTree(childNode.id, childNode.name, childNode.category) : null;
             })
-            .filter(c => c !== null);
-          
+            .filter((c) => c !== null);
+
           return {
             name: nodeName,
             children: children.length > 0 ? children : undefined,
             itemStyle: {
-              color: category === 0 ? '#ee6666' : category === 1 ? '#5470c6' : category === 2 ? '#91cc75' : '#73c0de',
+              color:
+                category === 0
+                  ? '#ee6666'
+                  : category === 1
+                    ? '#5470c6'
+                    : category === 2
+                      ? '#91cc75'
+                      : '#73c0de',
               borderColor: '#fff',
-              borderWidth: 2
+              borderWidth: 2,
             },
             label: {
               color: '#333',
-              fontWeight: category <= 1 ? 'bold' : 'normal'
-            }
+              fontWeight: category <= 1 ? 'bold' : 'normal',
+            },
           };
         };
 
@@ -107,7 +119,7 @@ export class InventoryDetail implements OnInit {
         this.chartOption = {
           tooltip: {
             trigger: 'item',
-            triggerOn: 'mousemove'
+            triggerOn: 'mousemove',
           },
           series: [
             {
@@ -125,21 +137,21 @@ export class InventoryDetail implements OnInit {
                 fontSize: 14,
                 backgroundColor: 'rgba(255,255,255,0.8)',
                 padding: [2, 4],
-                borderRadius: 3
+                borderRadius: 3,
               },
               leaves: {
                 label: {
                   position: 'right',
                   verticalAlign: 'middle',
-                  align: 'left'
-                }
+                  align: 'left',
+                },
               },
               expandAndCollapse: true,
               initialTreeDepth: -1,
               animationDuration: 550,
-              animationDurationUpdate: 750
-            }
-          ]
+              animationDurationUpdate: 750,
+            },
+          ],
         };
       }
 
@@ -150,9 +162,9 @@ export class InventoryDetail implements OnInit {
   openHostDialog(host?: Host) {
     const dialogRef = this.dialog.open(HostDialog, {
       width: '600px',
-      data: { host, inventoryId: this.inventoryId }
+      data: { host, inventoryId: this.inventoryId },
     });
-    dialogRef.afterClosed().subscribe(res => {
+    dialogRef.afterClosed().subscribe((res) => {
       if (res) this.loadAll();
     });
   }
@@ -166,9 +178,9 @@ export class InventoryDetail implements OnInit {
   openGroupDialog(group?: Group) {
     const dialogRef = this.dialog.open(GroupDialog, {
       width: '500px',
-      data: { group, inventoryId: this.inventoryId }
+      data: { group, inventoryId: this.inventoryId },
     });
-    dialogRef.afterClosed().subscribe(res => {
+    dialogRef.afterClosed().subscribe((res) => {
       if (res) this.loadAll();
     });
   }

@@ -1,5 +1,5 @@
 import { Component, Inject, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,34 +14,54 @@ export interface GroupDialogData {
 
 @Component({
   selector: 'app-group-dialog',
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+  ],
   template: `
     <h2 mat-dialog-title>{{ data.group ? 'Edit Group' : 'New Group' }}</h2>
     <mat-dialog-content>
       <form [formGroup]="groupForm" class="dialog-form">
         <mat-form-field appearance="fill">
           <mat-label>Name</mat-label>
-          <input matInput formControlName="name" placeholder="E.g., webservers">
-          <mat-error *ngIf="groupForm.get('name')?.hasError('required')">Name is required</mat-error>
+          <input matInput formControlName="name" placeholder="E.g., webservers" />
+          @if (groupForm.get('name')?.hasError('required')) {
+            <mat-error>Name is required</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="fill">
           <mat-label>Variables (JSON)</mat-label>
-          <textarea matInput formControlName="variables" rows="5" class="font-mono" placeholder="{}"></textarea>
-          <mat-error *ngIf="groupForm.get('variables')?.hasError('invalidJson')">Invalid JSON format</mat-error>
+          <textarea
+            matInput
+            formControlName="variables"
+            rows="5"
+            class="font-mono"
+            placeholder="{}"
+          ></textarea>
+          @if (groupForm.get('variables')?.hasError('invalidJson')) {
+            <mat-error>Invalid JSON format</mat-error>
+          }
         </mat-form-field>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-flat-button color="primary" [disabled]="groupForm.invalid" (click)="save()">Save</button>
+      <button mat-flat-button color="primary" [disabled]="groupForm.invalid" (click)="save()">
+        Save
+      </button>
     </mat-dialog-actions>
   `,
-  styles: [`
-    textarea.font-mono {
-      font-family: monospace;
-    }
-  `]
+  styles: [
+    `
+      textarea.font-mono {
+        font-family: monospace;
+      }
+    `,
+  ],
 })
 export class GroupDialog {
   private fb = inject(FormBuilder);
@@ -55,9 +75,13 @@ export class GroupDialog {
     this.groupForm = this.fb.group({
       name: [this.data.group?.name || '', Validators.required],
       variables: [
-        this.data.group?.variables ? (typeof this.data.group.variables === 'string' ? this.data.group.variables : JSON.stringify(this.data.group.variables, null, 2)) : '{}', 
-        [this.jsonValidator]
-      ]
+        this.data.group?.variables
+          ? typeof this.data.group.variables === 'string'
+            ? this.data.group.variables
+            : JSON.stringify(this.data.group.variables, null, 2)
+          : '{}',
+        [this.jsonValidator],
+      ],
     });
   }
 
@@ -76,11 +100,11 @@ export class GroupDialog {
 
     if (this.data.group?.id) {
       this.inventoryService.updateGroup(this.data.group.id, formVal).subscribe({
-        next: () => this.dialogRef.close(true)
+        next: () => this.dialogRef.close(true),
       });
     } else {
       this.inventoryService.createGroup(this.data.inventoryId, formVal).subscribe({
-        next: () => this.dialogRef.close(true)
+        next: () => this.dialogRef.close(true),
       });
     }
   }

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,7 +12,15 @@ import { AuthService } from '../../core/services/auth';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatDividerModule],
+  imports: [
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDividerModule,
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -25,7 +33,7 @@ export class Profile {
   passwordForm = this.fb.group({
     currentPassword: ['', Validators.required],
     newPassword: ['', [Validators.required, Validators.minLength(6)]],
-    confirmPassword: ['', Validators.required]
+    confirmPassword: ['', Validators.required],
   });
 
   onSubmit() {

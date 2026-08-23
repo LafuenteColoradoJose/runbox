@@ -7,15 +7,23 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
+
 import { Logo } from '../../components/logo/logo';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, Logo],
+  imports: [
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    Logo,
+  ],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrl: './login.css',
 })
 export class Login {
   private fb = inject(NonNullableFormBuilder);
@@ -24,7 +32,7 @@ export class Login {
 
   loginForm = this.fb.group({
     username: ['', Validators.required],
-    password: ['', Validators.required]
+    password: ['', Validators.required],
   });
 
   errorMessage = signal<string>('');
@@ -46,7 +54,7 @@ export class Login {
       error: (err) => {
         this.loading.set(false);
         this.errorMessage.set(err.error?.error || 'Error al iniciar sesión');
-      }
+      },
     });
   }
 }

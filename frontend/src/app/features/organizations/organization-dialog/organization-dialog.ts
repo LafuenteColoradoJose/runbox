@@ -1,5 +1,5 @@
 import { Component, Inject, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,9 +9,15 @@ import { InventoryService, Organization } from '../../../core/services/inventory
 
 @Component({
   selector: 'app-organization-dialog',
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+  ],
   templateUrl: './organization-dialog.html',
-  styleUrl: './organization-dialog.css'
+  styleUrl: './organization-dialog.css',
 })
 export class OrganizationDialog {
   private fb = inject(FormBuilder);
@@ -20,7 +26,7 @@ export class OrganizationDialog {
   data = inject(MAT_DIALOG_DATA) as Organization | null;
 
   orgForm: FormGroup = this.fb.group({
-    name: [this.data?.name || '', Validators.required]
+    name: [this.data?.name || '', Validators.required],
   });
 
   save() {
@@ -29,11 +35,11 @@ export class OrganizationDialog {
 
     if (this.data?.id) {
       this.inventoryService.updateOrganization(this.data.id, formVal).subscribe({
-        next: () => this.dialogRef.close(true)
+        next: () => this.dialogRef.close(true),
       });
     } else {
       this.inventoryService.createOrganization(formVal).subscribe({
-        next: () => this.dialogRef.close(true)
+        next: () => this.dialogRef.close(true),
       });
     }
   }
