@@ -24,13 +24,17 @@ En este repositorio se encuentran los manuales completos del proyecto:
 
 ---
 
-## 🏢 Arquitectura y Jerarquía de Inventarios
+## 🏢 Arquitectura, Jerarquía y RBAC (Control de Acceso)
 
-Runbox utiliza un modelo jerárquico estándar en la industria para organizar la infraestructura, diseñado para el control de acceso granular (RBAC):
+Runbox utiliza un modelo jerárquico estándar en la industria para organizar la infraestructura, diseñado intrínsecamente para un control de acceso granular basado en roles (RBAC):
 
 1. **Organización:** El contenedor principal (Ej. departamentos como *Ventas* o *RRHH*).
 2. **Inventario:** El entorno de trabajo aislado (Ej. *Datacenter Producción* o *Nube AWS*).
 3. **Grupos y Hosts:** Los equipos individuales y las agrupaciones lógicas, los cuales pueden tener asociadas **Variables (JSON)** profesionales que hereda la infraestructura inferior.
+
+### Control de Acceso (Roles)
+* **Administrador (`admin`):** Tiene acceso global. Puede crear/editar/eliminar organizaciones, inventarios, hosts y usuarios. Puede ver y lanzar todos los Playbooks del sistema.
+* **Usuario (`user`):** Tiene un acceso restringido. Sólo puede ver y operar sobre las **Organizaciones** que el administrador le haya asignado explícitamente. Consecuentemente, sólo puede lanzar Playbooks y visualizar inventarios pertenecientes a sus organizaciones, sin capacidad de alterarlos (solo lectura y ejecución).
 
 ---
 

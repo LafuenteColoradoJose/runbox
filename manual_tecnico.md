@@ -26,6 +26,12 @@ El modelo de datos relacional refleja una jerarquía estándar para plataformas 
 2. **Inventories (`inventories`)**: Agrupaciones de infraestructura pertenecientes a una organización (Ej. *AWS Production*).
 3. **Groups (`groups`)**: Agrupaciones lógicas de hosts (Ej. *web_servers*). Pueden almacenar variables compartidas en formato JSON.
 4. **Hosts (`hosts`)**: Máquinas finales gestionadas por Ansible, asociadas a uno o más grupos (`host_groups`). También soportan variables JSON individuales.
+5. **Users & Playbooks (`users`, `user_organizations`, `playbooks`)**: Los usuarios tienen un `role` (admin/user). Los usuarios normales están vinculados a organizaciones mediante la tabla puente `user_organizations`. Los Playbooks también pueden pertenecer a un `organization_id`. Esta estructura soporta el filtrado restrictivo del sistema.
+
+### Mecanismo de Seguridad (RBAC)
+Tanto la API como el Frontend (UI) se coordinan para el control de acceso:
+* **Nivel Base de Datos / API:** Los endpoints transaccionales (POST/PUT/DELETE) sobre la infraestructura y la gestión de usuarios están protegidos por el middleware `requireAdmin`. Además, las sentencias SQL filtran los `SELECT` usando la tabla `user_organizations` cuando el request proviene de un rol `user`, asegurando que no puedan ver ni ejecutar (en `/api/playbooks/run`) recursos fuera de sus organizaciones.
+* **Nivel UI:** El frontend utiliza inyección de dependencias con Signals (`authService.currentUser()?.role`) para suprimir renderizados condicionales (`@if`). Los usuarios estándar no cargan en el DOM los botones de edición/creación, ni rutas protegidas (ej. menú Users), ofreciendo una experiencia sin frustraciones ni errores de permisos.
 
 ---
 

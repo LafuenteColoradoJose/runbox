@@ -9,6 +9,8 @@ import { RouterModule } from '@angular/router';
 import { InventoryService, Inventory } from '../../core/services/inventory.service';
 import { InventoryDialog } from './inventory-dialog/inventory-dialog';
 
+import { AuthService } from '../../core/services/auth';
+
 @Component({
   selector: 'app-inventory',
   standalone: true,
@@ -27,11 +29,15 @@ export class InventoryComponent implements OnInit {
   private inventoryService = inject(InventoryService);
   private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
+  public authService = inject(AuthService);
 
   inventories: Inventory[] = [];
   displayedColumns: string[] = ['name', 'organization', 'actions'];
 
   ngOnInit(): void {
+    if (this.authService.currentUser()?.role !== 'admin') {
+      this.displayedColumns = ['name', 'organization'];
+    }
     this.loadInventories();
   }
 

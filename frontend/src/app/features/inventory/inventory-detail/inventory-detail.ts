@@ -11,6 +11,7 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 
 import { InventoryService, Host, Group, Inventory } from '../../../core/services/inventory.service';
+import { AuthService } from '../../../core/services/auth';
 import { HostDialog } from '../host-dialog/host-dialog';
 import { GroupDialog } from '../group-dialog/group-dialog';
 
@@ -35,6 +36,7 @@ export class InventoryDetail implements OnInit {
   private inventoryService = inject(InventoryService);
   private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
+  public authService = inject(AuthService);
 
   inventoryId!: number;
   inventory?: Inventory;
@@ -45,6 +47,13 @@ export class InventoryDetail implements OnInit {
 
   hostColumns: string[] = ['name', 'ip_address', 'groups', 'actions'];
   groupColumns: string[] = ['id', 'name', 'actions'];
+
+  constructor() {
+    if (this.authService.currentUser()?.role !== 'admin') {
+      this.hostColumns = this.hostColumns.filter(c => c !== 'actions');
+      this.groupColumns = this.groupColumns.filter(c => c !== 'actions');
+    }
+  }
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {

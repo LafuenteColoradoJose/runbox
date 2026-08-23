@@ -20,18 +20,22 @@ db.init = function() {
     CREATE TABLE IF NOT EXISTS playbooks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      path TEXT NOT NULL
+      path TEXT NOT NULL,
+      organization_id INTEGER,
+      FOREIGN KEY(organization_id) REFERENCES organizations(id) ON DELETE SET NULL
     );
     
     CREATE TABLE IF NOT EXISTS jobs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       playbook_id INTEGER,
+      user_id INTEGER,
       status TEXT,
       log_output TEXT DEFAULT '',
       started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       ended_at DATETIME,
-      FOREIGN KEY(playbook_id) REFERENCES playbooks(id)
+      FOREIGN KEY(playbook_id) REFERENCES playbooks(id),
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
     );
 
     CREATE TABLE IF NOT EXISTS users (
@@ -44,6 +48,14 @@ db.init = function() {
     CREATE TABLE IF NOT EXISTS organizations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE
+    );
+
+    CREATE TABLE IF NOT EXISTS user_organizations (
+      user_id INTEGER,
+      organization_id INTEGER,
+      PRIMARY KEY (user_id, organization_id),
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY(organization_id) REFERENCES organizations(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS inventories (
@@ -78,6 +90,17 @@ db.init = function() {
       FOREIGN KEY(group_id) REFERENCES groups(id) ON DELETE CASCADE
     );
   `);
+
+  // Asegurarnos de que las columnas nuevas existan si la DB ya estaba creada
+  const playbooksCols = db.prepare("PRAGMA table_info(playbooks)").all();
+  if (!playbooksCols.find(c => c.name === 'organization_id')) {
+    db.exec("ALTER TABLE playbooks ADD COLUMN organization_id INTEGER REFERENCES organizations(id) ON DELETE SET NULL");
+  }
+
+  const jobsCols = db.prepare("PRAGMA table_info(jobs)").all();
+  if (!jobsCols.find(c => c.name === 'user_id')) {
+    db.exec("ALTER TABLE jobs ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE SET NULL");
+  }
 
   // Sembrar el usuario administrador por defecto
   const userCountStmt = db.prepare('SELECT count(*) as count FROM users');

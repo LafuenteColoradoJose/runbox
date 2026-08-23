@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const db = require('./db');
 const { runPlaybook } = require('./ansibleRunner');
 const authMiddleware = require('./middleware/auth');
+const requireAdmin = require('./middleware/requireAdmin');
 
 const app = express();
 const server = http.createServer(app);
@@ -39,10 +40,127 @@ app.post('/api/auth/login', (req, res) => {
   res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
 });
 
+// --- USERS API (Admin Only) ---
+
+// Obtener todos los usuarios con sus organizaciones asignadas
+app.get('/api/users', authMiddleware, requireAdmin, (req, res) => {
+  try {
+    const users = db.prepare('SELECT id, username, role FROM users').all();
+    const userOrgsStmt = db.prepare(`
+      SELECT o.id, o.name 
+      FROM organizations o
+      JOIN user_organizations uo ON o.id = uo.organization_id
+      WHERE uo.user_id = ?
+    `);
+    
+    users.forEach(user => {
+      user.organizations = userOrgsStmt.all(user.id);
+    });
+    
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener usuarios' });
+  }
+});
+
+// Crear usuario
+app.post('/api/users', authMiddleware, requireAdmin, (req, res) => {
+  const { username, password, role, organizations } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: 'El nombre de usuario y contraseña son requeridos' });
+  }
+  
+  try {
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
+    
+    db.prepare('BEGIN').run();
+    const insertStmt = db.prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+    const result = insertStmt.run(username, hash, role || 'user');
+    const userId = result.lastInsertRowid;
+    
+    if (organizations && Array.isArray(organizations)) {
+      const insertOrg = db.prepare('INSERT INTO user_organizations (user_id, organization_id) VALUES (?, ?)');
+      for (const orgId of organizations) {
+        insertOrg.run(userId, orgId);
+      }
+    }
+    db.prepare('COMMIT').run();
+    
+    res.status(201).json({ id: userId, username, role });
+  } catch (error) {
+    db.prepare('ROLLBACK').run();
+    if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      return res.status(400).json({ error: 'El nombre de usuario ya existe' });
+    }
+    console.error(error);
+    res.status(500).json({ error: 'Error al crear usuario' });
+  }
+});
+
+// Actualizar usuario
+app.put('/api/users/:id', authMiddleware, requireAdmin, (req, res) => {
+  const { password, role, organizations } = req.body;
+  const userId = req.params.id;
+  
+  try {
+    db.prepare('BEGIN').run();
+    
+    if (password) {
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(password, salt);
+      db.prepare('UPDATE users SET password = ?, role = ? WHERE id = ?').run(hash, role, userId);
+    } else {
+      db.prepare('UPDATE users SET role = ? WHERE id = ?').run(role, userId);
+    }
+    
+    if (organizations && Array.isArray(organizations)) {
+      db.prepare('DELETE FROM user_organizations WHERE user_id = ?').run(userId);
+      const insertOrg = db.prepare('INSERT INTO user_organizations (user_id, organization_id) VALUES (?, ?)');
+      for (const orgId of organizations) {
+        insertOrg.run(userId, orgId);
+      }
+    }
+    
+    db.prepare('COMMIT').run();
+    res.json({ success: true });
+  } catch (error) {
+    db.prepare('ROLLBACK').run();
+    res.status(500).json({ error: 'Error al actualizar usuario' });
+  }
+});
+
+// Eliminar usuario
+app.delete('/api/users/:id', authMiddleware, requireAdmin, (req, res) => {
+  try {
+    db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar usuario' });
+  }
+});
+
 // Obtener todos los playbooks
 app.get('/api/playbooks', authMiddleware, (req, res) => {
-  const stmt = db.prepare('SELECT * FROM playbooks');
-  res.json(stmt.all());
+  let playbooks;
+  if (req.user.role === 'admin') {
+    playbooks = db.prepare(`
+      SELECT p.*, o.name as organization_name 
+      FROM playbooks p 
+      LEFT JOIN organizations o ON p.organization_id = o.id
+    `).all();
+  } else {
+    playbooks = db.prepare(`
+      SELECT p.*, o.name as organization_name 
+      FROM playbooks p
+      LEFT JOIN organizations o ON p.organization_id = o.id
+      WHERE p.organization_id IS NULL OR p.organization_id IN (
+        SELECT organization_id FROM user_organizations WHERE user_id = ?
+      )
+    `).all(req.user.id);
+  }
+  res.json(playbooks);
 });
 
 // Ejecutar playbook
@@ -55,8 +173,16 @@ app.post('/api/playbooks/run', authMiddleware, async (req, res) => {
     return res.status(404).json({ error: 'Playbook no encontrado' });
   }
 
-  const insertJob = db.prepare(`INSERT INTO jobs (playbook_id, status) VALUES (?, 'running')`);
-  const result = insertJob.run(playbook.id);
+  // Comprobar autorización del playbook
+  if (req.user.role !== 'admin' && playbook.organization_id !== null) {
+    const hasAccess = db.prepare(`SELECT 1 FROM user_organizations WHERE user_id = ? AND organization_id = ?`).get(req.user.id, playbook.organization_id);
+    if (!hasAccess) {
+      return res.status(403).json({ error: 'No tienes acceso a este playbook' });
+    }
+  }
+
+  const insertJob = db.prepare(`INSERT INTO jobs (playbook_id, user_id, status) VALUES (?, ?, 'running')`);
+  const result = insertJob.run(playbook.id, req.user.id);
   const jobId = result.lastInsertRowid;
 
   // Respondemos rápidamente al frontend y el proceso se queda en segundo plano
@@ -76,40 +202,53 @@ app.post('/api/playbooks/run', authMiddleware, async (req, res) => {
 app.get('/api/jobs/:id', authMiddleware, (req, res) => {
   const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(req.params.id);
   if (!job) return res.status(404).json({ error: 'Job no encontrado' });
+  
+  if (req.user.role !== 'admin' && job.user_id !== req.user.id) {
+    return res.status(403).json({ error: 'No tienes acceso a este resultado' });
+  }
+
   res.json(job);
 });
 
 // Obtener estadísticas del dashboard
 app.get('/api/dashboard/stats', authMiddleware, (req, res) => {
   try {
-    const totalPlaybooks = db.prepare('SELECT count(*) as count FROM playbooks').get().count;
-    const totalJobs = db.prepare('SELECT count(*) as count FROM jobs').get().count;
-    const failedJobs = db.prepare('SELECT count(*) as count FROM jobs WHERE status = \'failed\'').get().count;
-    
-    const totalOrganizations = db.prepare('SELECT count(*) as count FROM organizations').get().count;
-    const totalInventories = db.prepare('SELECT count(*) as count FROM inventories').get().count;
-    const totalGroups = db.prepare('SELECT count(*) as count FROM groups').get().count;
-    const totalHosts = db.prepare('SELECT count(*) as count FROM hosts').get().count;
-    
-    // Obtener últimos 5 trabajos con el nombre de su playbook
-    const recentJobs = db.prepare(`
-      SELECT jobs.id, jobs.status, jobs.started_at, playbooks.name as playbook_name 
-      FROM jobs 
-      JOIN playbooks ON jobs.playbook_id = playbooks.id 
-      ORDER BY jobs.started_at DESC 
-      LIMIT 5
-    `).all();
+    let stats = {};
+    if (req.user.role === 'admin') {
+      stats.totalPlaybooks = db.prepare('SELECT count(*) as count FROM playbooks').get().count;
+      stats.totalJobs = db.prepare('SELECT count(*) as count FROM jobs').get().count;
+      stats.failedJobs = db.prepare("SELECT count(*) as count FROM jobs WHERE status = 'failed'").get().count;
+      stats.totalOrganizations = db.prepare('SELECT count(*) as count FROM organizations').get().count;
+      stats.totalInventories = db.prepare('SELECT count(*) as count FROM inventories').get().count;
+      stats.totalGroups = db.prepare('SELECT count(*) as count FROM groups').get().count;
+      stats.totalHosts = db.prepare('SELECT count(*) as count FROM hosts').get().count;
+      stats.recentJobs = db.prepare(`
+        SELECT jobs.id, jobs.status, jobs.started_at, playbooks.name as playbook_name 
+        FROM jobs 
+        JOIN playbooks ON jobs.playbook_id = playbooks.id 
+        ORDER BY jobs.started_at DESC 
+        LIMIT 5
+      `).all();
+    } else {
+      const uId = req.user.id;
+      stats.totalPlaybooks = db.prepare(`SELECT count(*) as count FROM playbooks WHERE organization_id IS NULL OR organization_id IN (SELECT organization_id FROM user_organizations WHERE user_id = ?)`).get(uId).count;
+      stats.totalJobs = db.prepare(`SELECT count(*) as count FROM jobs WHERE user_id = ?`).get(uId).count;
+      stats.failedJobs = db.prepare(`SELECT count(*) as count FROM jobs WHERE status = 'failed' AND user_id = ?`).get(uId).count;
+      stats.totalOrganizations = db.prepare(`SELECT count(*) as count FROM user_organizations WHERE user_id = ?`).get(uId).count;
+      stats.totalInventories = db.prepare(`SELECT count(*) as count FROM inventories WHERE organization_id IN (SELECT organization_id FROM user_organizations WHERE user_id = ?)`).get(uId).count;
+      stats.totalGroups = db.prepare(`SELECT count(g.id) as count FROM groups g JOIN inventories i ON g.inventory_id = i.id WHERE i.organization_id IN (SELECT organization_id FROM user_organizations WHERE user_id = ?)`).get(uId).count;
+      stats.totalHosts = db.prepare(`SELECT count(h.id) as count FROM hosts h JOIN inventories i ON h.inventory_id = i.id WHERE i.organization_id IN (SELECT organization_id FROM user_organizations WHERE user_id = ?)`).get(uId).count;
+      stats.recentJobs = db.prepare(`
+        SELECT jobs.id, jobs.status, jobs.started_at, playbooks.name as playbook_name 
+        FROM jobs 
+        JOIN playbooks ON jobs.playbook_id = playbooks.id 
+        WHERE jobs.user_id = ?
+        ORDER BY jobs.started_at DESC 
+        LIMIT 5
+      `).all(uId);
+    }
 
-    res.json({
-      totalPlaybooks,
-      totalJobs,
-      failedJobs,
-      totalOrganizations,
-      totalInventories,
-      totalGroups,
-      totalHosts,
-      recentJobs
-    });
+    res.json(stats);
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
     res.status(500).json({ error: 'Error interno del servidor al obtener estadísticas' });
@@ -121,18 +260,44 @@ app.get('/api/dashboard/stats', authMiddleware, (req, res) => {
 // Obtener todos los inventarios (con la info de su organización)
 app.get('/api/inventories', authMiddleware, (req, res) => {
   try {
-    const inventories = db.prepare(`
-      SELECT i.id, i.name, o.name as organization_name 
-      FROM inventories i
-      LEFT JOIN organizations o ON i.organization_id = o.id
-    `).all();
+    let inventories;
+    if (req.user.role === 'admin') {
+      inventories = db.prepare(`
+        SELECT i.id, i.name, o.name as organization_name 
+        FROM inventories i
+        LEFT JOIN organizations o ON i.organization_id = o.id
+      `).all();
+    } else {
+      inventories = db.prepare(`
+        SELECT i.id, i.name, o.name as organization_name 
+        FROM inventories i
+        LEFT JOIN organizations o ON i.organization_id = o.id
+        JOIN user_organizations uo ON i.organization_id = uo.organization_id
+        WHERE uo.user_id = ?
+      `).all(req.user.id);
+    }
     res.json(inventories);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get('/api/inventories/:id', authMiddleware, (req, res) => {
+function checkInventoryAccess(req, res, next) {
+  if (req.user.role === 'admin') return next();
+  const inventoryId = req.params.id;
+  const hasAccess = db.prepare(`
+    SELECT 1 FROM inventories i
+    JOIN user_organizations uo ON i.organization_id = uo.organization_id
+    WHERE i.id = ? AND uo.user_id = ?
+  `).get(inventoryId, req.user.id);
+  
+  if (!hasAccess) {
+    return res.status(403).json({ error: 'Acceso denegado a este inventario' });
+  }
+  next();
+}
+
+app.get('/api/inventories/:id', authMiddleware, checkInventoryAccess, (req, res) => {
   try {
     const inventory = db.prepare(`
       SELECT i.id, i.name, o.name as organization_name 
@@ -149,7 +314,7 @@ app.get('/api/inventories/:id', authMiddleware, (req, res) => {
 });
 
 // Obtener los hosts de un inventario con sus grupos
-app.get('/api/inventories/:id/hosts', authMiddleware, (req, res) => {
+app.get('/api/inventories/:id/hosts', authMiddleware, checkInventoryAccess, (req, res) => {
   try {
     const inventoryId = req.params.id;
     // Seleccionar hosts
@@ -179,7 +344,7 @@ app.get('/api/inventories/:id/hosts', authMiddleware, (req, res) => {
 });
 
 // Obtener la topología del inventario (Formato Grafo para ECharts)
-app.get('/api/inventories/:id/topology', authMiddleware, (req, res) => {
+app.get('/api/inventories/:id/topology', authMiddleware, checkInventoryAccess, (req, res) => {
   try {
     const inventoryId = req.params.id;
     const inventory = db.prepare('SELECT * FROM inventories WHERE id = ?').get(inventoryId);
@@ -277,12 +442,21 @@ app.get('/api/inventories/:id/topology', authMiddleware, (req, res) => {
 // --- ORGANIZATIONS API ---
 app.get('/api/organizations', authMiddleware, (req, res) => {
   try {
-    const orgs = db.prepare('SELECT * FROM organizations').all();
+    let orgs;
+    if (req.user.role === 'admin') {
+      orgs = db.prepare('SELECT * FROM organizations').all();
+    } else {
+      orgs = db.prepare(`
+        SELECT o.* FROM organizations o 
+        JOIN user_organizations uo ON o.id = uo.organization_id 
+        WHERE uo.user_id = ?
+      `).all(req.user.id);
+    }
     res.json(orgs);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/organizations', authMiddleware, (req, res) => {
+app.post('/api/organizations', authMiddleware, requireAdmin, (req, res) => {
   try {
     const { name } = req.body;
     const stmt = db.prepare('INSERT INTO organizations (name) VALUES (?)');
@@ -291,7 +465,7 @@ app.post('/api/organizations', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/organizations/:id', authMiddleware, (req, res) => {
+app.put('/api/organizations/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
     const { name } = req.body;
     db.prepare('UPDATE organizations SET name = ? WHERE id = ?').run(name, req.params.id);
@@ -299,7 +473,7 @@ app.put('/api/organizations/:id', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/organizations/:id', authMiddleware, (req, res) => {
+app.delete('/api/organizations/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
     db.prepare('DELETE FROM organizations WHERE id = ?').run(req.params.id);
     res.json({ success: true });
@@ -307,7 +481,7 @@ app.delete('/api/organizations/:id', authMiddleware, (req, res) => {
 });
 
 // --- INVENTORIES API (CRUD) ---
-app.post('/api/inventories', authMiddleware, (req, res) => {
+app.post('/api/inventories', authMiddleware, requireAdmin, (req, res) => {
   try {
     const { name, organization_id } = req.body;
     const stmt = db.prepare('INSERT INTO inventories (name, organization_id) VALUES (?, ?)');
@@ -316,7 +490,7 @@ app.post('/api/inventories', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/inventories/:id', authMiddleware, (req, res) => {
+app.put('/api/inventories/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
     const { name, organization_id } = req.body;
     db.prepare('UPDATE inventories SET name = ?, organization_id = ? WHERE id = ?').run(name, organization_id, req.params.id);
@@ -324,7 +498,7 @@ app.put('/api/inventories/:id', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/inventories/:id', authMiddleware, (req, res) => {
+app.delete('/api/inventories/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
     db.prepare('DELETE FROM inventories WHERE id = ?').run(req.params.id);
     res.json({ success: true });
@@ -332,13 +506,13 @@ app.delete('/api/inventories/:id', authMiddleware, (req, res) => {
 });
 
 // --- GROUPS API ---
-app.get("/api/inventories/:id/groups", authMiddleware, (req, res) => {
+app.get("/api/inventories/:id/groups", authMiddleware, checkInventoryAccess, (req, res) => {
   try {
     const groups = db.prepare("SELECT * FROM groups WHERE inventory_id = ?").all(req.params.id);
     res.json(groups);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
-app.post('/api/inventories/:id/groups', authMiddleware, (req, res) => {
+app.post('/api/inventories/:id/groups', authMiddleware, requireAdmin, (req, res) => {
   try {
     const { name, variables } = req.body;
     const stmt = db.prepare('INSERT INTO groups (inventory_id, name, variables) VALUES (?, ?, ?)');
@@ -347,7 +521,7 @@ app.post('/api/inventories/:id/groups', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/groups/:id', authMiddleware, (req, res) => {
+app.put('/api/groups/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
     const { name, variables } = req.body;
     db.prepare('UPDATE groups SET name = ?, variables = ? WHERE id = ?').run(name, variables || '{}', req.params.id);
@@ -355,7 +529,7 @@ app.put('/api/groups/:id', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/groups/:id', authMiddleware, (req, res) => {
+app.delete('/api/groups/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
     db.prepare('DELETE FROM groups WHERE id = ?').run(req.params.id);
     res.json({ success: true });
@@ -363,7 +537,7 @@ app.delete('/api/groups/:id', authMiddleware, (req, res) => {
 });
 
 // --- HOSTS API ---
-app.post('/api/inventories/:id/hosts', authMiddleware, (req, res) => {
+app.post('/api/inventories/:id/hosts', authMiddleware, requireAdmin, (req, res) => {
   try {
     const { name, ip_address, variables, groups } = req.body;
     const insertHost = db.prepare('INSERT INTO hosts (inventory_id, name, ip_address, variables) VALUES (?, ?, ?, ?)');
@@ -381,7 +555,7 @@ app.post('/api/inventories/:id/hosts', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/hosts/:id', authMiddleware, (req, res) => {
+app.put('/api/hosts/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
     const { name, ip_address, variables, groups } = req.body;
     const hostId = req.params.id;
@@ -399,7 +573,7 @@ app.put('/api/hosts/:id', authMiddleware, (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/hosts/:id', authMiddleware, (req, res) => {
+app.delete('/api/hosts/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
     db.prepare('DELETE FROM hosts WHERE id = ?').run(req.params.id);
     res.json({ success: true });

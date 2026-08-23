@@ -9,6 +9,16 @@ Runbox está diseñado para simplificar las ejecuciones de los *Playbooks* de An
 > Para acceder al portal, utiliza el usuario `administrator` y la contraseña `Usuario1.`
 
 Destaca por ofrecer una experiencia visual **Premium y Moderna** (basada en *Glassmorphism*, transiciones suaves y un entorno responsivo), garantizando además la máxima seguridad (por ejemplo, impidiendo volver atrás al Login una vez iniciada la sesión).
+
+---
+
+## 🔐 Seguridad y Roles de Usuario (RBAC)
+
+Runbox es una plataforma multiusuario que implementa un modelo de Control de Acceso Basado en Roles (RBAC). Dependiendo de tu usuario, verás una interfaz adaptada a tus permisos:
+
+* **Administrador (`admin`):** Tiene privilegios completos sobre toda la plataforma. Es el único que ve la pestaña de "Usuarios" en el menú, y puede crear, editar y eliminar infraestructuras (Organizaciones, Inventarios, Hosts) y ejecutar cualquier Playbook.
+* **Usuario Estándar (`user`):** Tiene una vista limpia y acotada. Sólo podrá visualizar y ejecutar Playbooks, e inspeccionar Inventarios que pertenezcan a las **Organizaciones que le hayan sido asignadas** por el administrador. No verá botones de creación o borrado de infraestructura para evitar accidentes.
+
 ---
 
 ## 🏢 Arquitectura y Jerarquía de Inventarios

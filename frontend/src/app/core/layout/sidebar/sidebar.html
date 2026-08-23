@@ -54,6 +54,17 @@
           <div class="tooltip">Inventory</div>
         </a>
       </li>
+      @if (currentUser()?.role === 'admin') {
+        <li>
+          <a class="nav-item group-item" routerLink="/users" routerLinkActive="active" title="Users">
+            <div class="icon-wrapper">
+              <mat-icon>people</mat-icon>
+            </div>
+            <span class="nav-label">Users</span>
+            <div class="tooltip">Users</div>
+          </a>
+        </li>
+      }
     </ul>
 
     <div class="bottom-actions">

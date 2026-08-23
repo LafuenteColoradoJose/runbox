@@ -22,11 +22,13 @@
       <!-- HOSTS TAB -->
       <mat-tab label="Hosts">
         <div class="tab-content">
-          <div class="action-bar">
-            <button mat-flat-button color="primary" (click)="openHostDialog()">
-              <mat-icon>add</mat-icon> Add Host
-            </button>
-          </div>
+          @if (authService.currentUser()?.role === 'admin') {
+            <div class="action-bar">
+              <button mat-flat-button color="primary" (click)="openHostDialog()">
+                <mat-icon>add</mat-icon> Add Host
+              </button>
+            </div>
+          }
           <table mat-table [dataSource]="hosts" class="w-full">
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef> Name </th>
@@ -52,12 +54,14 @@
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef class="text-right"> Actions </th>
               <td mat-cell *matCellDef="let element" class="text-right">
-                <button mat-icon-button color="primary" (click)="openHostDialog(element)" title="Edit">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button style="color: red;" (click)="deleteHost(element.id)" title="Delete">
-                  <mat-icon>delete</mat-icon>
-                </button>
+                @if (authService.currentUser()?.role === 'admin') {
+                  <button mat-icon-button color="primary" (click)="openHostDialog(element)" title="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button style="color: red;" (click)="deleteHost(element.id)" title="Delete">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
               </td>
             </ng-container>
 
@@ -75,11 +79,13 @@
       <!-- GROUPS TAB -->
       <mat-tab label="Groups">
         <div class="tab-content">
-          <div class="action-bar">
-            <button mat-flat-button color="primary" (click)="openGroupDialog()">
-              <mat-icon>add</mat-icon> Add Group
-            </button>
-          </div>
+          @if (authService.currentUser()?.role === 'admin') {
+            <div class="action-bar">
+              <button mat-flat-button color="primary" (click)="openGroupDialog()">
+                <mat-icon>add</mat-icon> Add Group
+              </button>
+            </div>
+          }
           <table mat-table [dataSource]="groups" class="w-full">
             <ng-container matColumnDef="id">
               <th mat-header-cell *matHeaderCellDef> ID </th>
@@ -94,12 +100,14 @@
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef class="text-right"> Actions </th>
               <td mat-cell *matCellDef="let element" class="text-right">
-                <button mat-icon-button color="primary" (click)="openGroupDialog(element)" title="Edit">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button style="color: red;" (click)="deleteGroup(element.id)" title="Delete">
-                  <mat-icon>delete</mat-icon>
-                </button>
+                @if (authService.currentUser()?.role === 'admin') {
+                  <button mat-icon-button color="primary" (click)="openGroupDialog(element)" title="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button style="color: red;" (click)="deleteGroup(element.id)" title="Delete">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
               </td>
             </ng-container>
 

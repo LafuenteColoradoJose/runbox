@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { InventoryService, Organization } from '../../../core/services/inventory.service';
 import { OrganizationDialog } from '../organization-dialog/organization-dialog';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-organizations-list',
@@ -17,11 +18,15 @@ export class OrganizationsList implements OnInit {
   private inventoryService = inject(InventoryService);
   private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
+  public authService = inject(AuthService);
 
   organizations: Organization[] = [];
   displayedColumns: string[] = ['id', 'name', 'actions'];
 
   ngOnInit(): void {
+    if (this.authService.currentUser()?.role !== 'admin') {
+      this.displayedColumns = ['id', 'name'];
+    }
     this.loadOrganizations();
   }
 
