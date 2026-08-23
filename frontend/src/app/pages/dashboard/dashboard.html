@@ -5,11 +5,6 @@
       <h1>Hello, {{ currentUser()?.username || 'User' }} 👋</h1>
       <p>Welcome back to your orchestrator. Here is a summary of your environment.</p>
     </div>
-    <div class="header-actions">
-      <a routerLink="/playbooks" class="btn-primary">
-        <span class="icon">🚀</span> Launch Playbook
-      </a>
-    </div>
   </header>
 
   @if (stats(); as s) {
@@ -17,10 +12,50 @@
     <div class="stats-grid">
       <div class="stat-card glass-panel">
         <div class="stat-icon playbooks-icon">
+          <span>🏢</span>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Organizations</p>
+          <h2 class="stat-value">{{ s.totalOrganizations }}</h2>
+        </div>
+      </div>
+
+      <div class="stat-card glass-panel">
+        <div class="stat-icon jobs-icon">
+          <span>📦</span>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Inventories</p>
+          <h2 class="stat-value">{{ s.totalInventories }}</h2>
+        </div>
+      </div>
+
+      <div class="stat-card glass-panel">
+        <div class="stat-icon playbooks-icon">
+          <span>👥</span>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Groups</p>
+          <h2 class="stat-value">{{ s.totalGroups }}</h2>
+        </div>
+      </div>
+
+      <div class="stat-card glass-panel">
+        <div class="stat-icon jobs-icon">
+          <span>🖥️</span>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Hosts</p>
+          <h2 class="stat-value">{{ s.totalHosts }}</h2>
+        </div>
+      </div>
+
+      <div class="stat-card glass-panel">
+        <div class="stat-icon playbooks-icon">
           <span>📚</span>
         </div>
         <div class="stat-content">
-          <p class="stat-label">Available Playbooks</p>
+          <p class="stat-label">Playbooks</p>
           <h2 class="stat-value">{{ s.totalPlaybooks }}</h2>
         </div>
       </div>
@@ -30,7 +65,7 @@
           <span>⚙️</span>
         </div>
         <div class="stat-content">
-          <p class="stat-label">Total Executions</p>
+          <p class="stat-label">Executions</p>
           <h2 class="stat-value">{{ s.totalJobs }}</h2>
         </div>
       </div>
@@ -40,7 +75,7 @@
           <span>⚠️</span>
         </div>
         <div class="stat-content">
-          <p class="stat-label">Failed Jobs</p>
+          <p class="stat-label">Failed</p>
           <h2 class="stat-value">{{ s.failedJobs }}</h2>
         </div>
       </div>

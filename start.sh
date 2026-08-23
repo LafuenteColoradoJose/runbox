@@ -7,8 +7,8 @@ echo "[1/3] Iniciando contenedor Docker (runbox_test)..."
 docker start runbox_test
 
 # 2. Backend
-echo "[2/3] Iniciando el Backend local en segundo plano..."
-node backend/server.js &
+echo "[2/3] Iniciando el Backend local en segundo plano (con nodemon)..."
+npx nodemon --watch backend backend/server.js &
 BACKEND_PID=$!
 
 # Esperar unos segundos a que el backend esté listo

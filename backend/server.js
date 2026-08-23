@@ -86,6 +86,11 @@ app.get('/api/dashboard/stats', authMiddleware, (req, res) => {
     const totalJobs = db.prepare('SELECT count(*) as count FROM jobs').get().count;
     const failedJobs = db.prepare('SELECT count(*) as count FROM jobs WHERE status = \'failed\'').get().count;
     
+    const totalOrganizations = db.prepare('SELECT count(*) as count FROM organizations').get().count;
+    const totalInventories = db.prepare('SELECT count(*) as count FROM inventories').get().count;
+    const totalGroups = db.prepare('SELECT count(*) as count FROM groups').get().count;
+    const totalHosts = db.prepare('SELECT count(*) as count FROM hosts').get().count;
+    
     // Obtener últimos 5 trabajos con el nombre de su playbook
     const recentJobs = db.prepare(`
       SELECT jobs.id, jobs.status, jobs.started_at, playbooks.name as playbook_name 
@@ -99,6 +104,10 @@ app.get('/api/dashboard/stats', authMiddleware, (req, res) => {
       totalPlaybooks,
       totalJobs,
       failedJobs,
+      totalOrganizations,
+      totalInventories,
+      totalGroups,
+      totalHosts,
       recentJobs
     });
   } catch (error) {

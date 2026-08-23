@@ -14,6 +14,10 @@ export interface DashboardStats {
   totalPlaybooks: number;
   totalJobs: number;
   failedJobs: number;
+  totalOrganizations: number;
+  totalInventories: number;
+  totalGroups: number;
+  totalHosts: number;
   recentJobs: RecentJob[];
 }
 
