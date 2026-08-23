@@ -1,8 +1,4 @@
-@if (authService.isAuthenticated()) {
-  <app-navbar></app-navbar>
-}
-
-<mat-sidenav-container class="sidenav-container" [style.height]="authService.isAuthenticated() ? 'calc(100vh - 64px)' : '100vh'">
+<mat-sidenav-container class="sidenav-container" style="height: 100vh;">
   @if (authService.isAuthenticated()) {
     <mat-sidenav mode="side" opened class="sidenav">
       <app-sidebar></app-sidebar>

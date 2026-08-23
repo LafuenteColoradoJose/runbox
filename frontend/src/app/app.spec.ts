@@ -28,19 +28,19 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render navbar when authenticated', async () => {
+  it('should render sidebar when authenticated', async () => {
     authServiceMock.isAuthenticated.set(true);
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-navbar')).toBeTruthy();
+    expect(compiled.querySelector('app-sidebar')).toBeTruthy();
   });
 
-  it('should not render navbar when not authenticated', async () => {
+  it('should not render sidebar when not authenticated', async () => {
     authServiceMock.isAuthenticated.set(false);
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-navbar')).toBeFalsy();
+    expect(compiled.querySelector('app-sidebar')).toBeFalsy();
   });
 });

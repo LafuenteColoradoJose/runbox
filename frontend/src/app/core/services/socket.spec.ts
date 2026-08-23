@@ -3,10 +3,12 @@ import { SocketService } from './socket';
 import { vi } from 'vitest';
 import { io } from 'socket.io-client';
 
-const mockSocket = {
-  on: vi.fn(),
-  off: vi.fn()
-};
+const { mockSocket } = vi.hoisted(() => ({
+  mockSocket: {
+    on: vi.fn(),
+    off: vi.fn()
+  }
+}));
 
 vi.mock('socket.io-client', () => {
   return {

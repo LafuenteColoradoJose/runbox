@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
 import * as echarts from 'echarts';
 import { provideEchartsCore } from 'ngx-echarts';
 
@@ -11,7 +11,7 @@ import { authInterceptor } from './core/interceptors/auth-interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
-    provideRouter(routes, withComponentInputBinding()), 
+    provideRouter(routes, withComponentInputBinding(), withViewTransitions()), 
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideEchartsCore({ echarts }),

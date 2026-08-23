@@ -1,18 +1,104 @@
-    <mat-nav-list class="nav-list">
-      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>dashboard</mat-icon>
-        <span matListItemTitle>Dashboard</span>
+<!-- Main Container -->
+<nav class="sidebar group">
+  
+  <!-- Header / Logo -->
+  <div class="sidebar-header">
+    <div class="logo-wrapper">
+      <div class="logo-icon">
+        <mat-icon>terminal</mat-icon>
+      </div>
+      <div class="logo-text">
+        Runbox
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="sidebar-content custom-scrollbar">
+    
+    <!-- Menu Items -->
+    <ul class="nav-menu">
+      <li>
+        <a class="nav-item group-item" routerLink="/dashboard" routerLinkActive="active" title="Dashboard">
+          <div class="icon-wrapper">
+            <mat-icon>dashboard</mat-icon>
+          </div>
+          <span class="nav-label">Dashboard</span>
+          <div class="tooltip">Dashboard</div>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item group-item" routerLink="/playbooks" routerLinkActive="active" title="Playbooks">
+          <div class="icon-wrapper">
+            <mat-icon>library_books</mat-icon>
+          </div>
+          <span class="nav-label">Playbooks</span>
+          <div class="tooltip">Playbooks</div>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item group-item" routerLink="/organizations" routerLinkActive="active" title="Organizations">
+          <div class="icon-wrapper">
+            <mat-icon>business</mat-icon>
+          </div>
+          <span class="nav-label">Organizations</span>
+          <div class="tooltip">Organizations</div>
+        </a>
+      </li>
+      <li>
+        <a class="nav-item group-item" routerLink="/inventory" routerLinkActive="active" title="Inventory">
+          <div class="icon-wrapper">
+            <mat-icon>dns</mat-icon>
+          </div>
+          <span class="nav-label">Inventory</span>
+          <div class="tooltip">Inventory</div>
+        </a>
+      </li>
+    </ul>
+
+    <div class="bottom-actions">
+      <!-- Divider -->
+      <div class="divider"></div>
+
+      <!-- User Profile -->
+      @if (currentUser()) {
+        <a class="nav-item group-item user-profile" routerLink="/profile" routerLinkActive="active">
+          <div class="icon-wrapper avatar">
+            {{ currentUser()?.username?.charAt(0)?.toUpperCase() }}
+          </div>
+          <span class="nav-label">{{ currentUser()?.username }}</span>
+          <div class="tooltip">My Profile</div>
+        </a>
+      }
+
+      <!-- Settings -->
+      <a class="nav-item group-item" routerLink="/settings" routerLinkActive="active" title="Settings">
+        <div class="icon-wrapper">
+          <mat-icon>settings</mat-icon>
+        </div>
+        <span class="nav-label">Settings</span>
+        <div class="tooltip">Settings</div>
       </a>
-      <a mat-list-item routerLink="/playbooks" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>library_books</mat-icon>
-        <span matListItemTitle>Playbooks</span>
-      </a>
-      <a mat-list-item routerLink="/organizations" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>business</mat-icon>
-        <span matListItemTitle>Organizations</span>
-      </a>
-      <a mat-list-item routerLink="/inventory" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>dns</mat-icon>
-        <span matListItemTitle>Inventory</span>
-      </a>
-    </mat-nav-list>
+
+      <!-- Theme Toggle -->
+      <button class="nav-item group-item action-btn" (click)="toggleTheme()" title="Toggle Theme">
+        <div class="icon-wrapper">
+          <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </div>
+        <span class="nav-label">
+          {{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}
+        </span>
+        <div class="tooltip">Toggle Theme</div>
+      </button>
+
+      <!-- Logout -->
+      <button class="nav-item group-item danger-btn action-btn" (click)="logout()" title="Logout">
+        <div class="icon-wrapper">
+          <mat-icon>logout</mat-icon>
+        </div>
+        <span class="nav-label">Logout</span>
+        <div class="tooltip">Logout</div>
+      </button>
+    </div>
+  </div>
+</nav>

@@ -50,5 +50,28 @@ describe('db initialization', () => {
 
     // Check if test.yml file was generated
     expect(fs.existsSync(testPlaybookPath)).toBe(true);
+
+    // Check if dummy organization was created
+    const orgStmt = db.prepare('SELECT * FROM organizations WHERE name = ?');
+    const org = orgStmt.get('Organización de Pruebas (Dummy)');
+    expect(org).toBeDefined();
+
+    // Check if dummy inventory was created
+    const invStmt = db.prepare('SELECT * FROM inventories WHERE name = ?');
+    const inv = invStmt.get('Inventario Principal (Dummy)');
+    expect(inv).toBeDefined();
+    expect(inv.organization_id).toBe(org.id);
+
+    // Check if dummy group was created
+    const groupStmt = db.prepare('SELECT * FROM groups WHERE name = ?');
+    const group = groupStmt.get('web_servers_dummy');
+    expect(group).toBeDefined();
+    expect(group.inventory_id).toBe(inv.id);
+
+    // Check if dummy host was created
+    const hostStmt = db.prepare('SELECT * FROM hosts WHERE name = ?');
+    const host = hostStmt.get('web-01-dummy.local');
+    expect(host).toBeDefined();
+    expect(host.inventory_id).toBe(inv.id);
   });
 });
