@@ -10,17 +10,25 @@
 }
 
 .sidenav {
-  width: 65px;
-  background-color: var(--mat-sys-surface-container);
+  width: 72px;
+  margin: 16px;
+  height: calc(100% - 32px) !important; /* Respetamos los 16px arriba y abajo */
+  border-radius: 20px;
+  background-color: color-mix(in srgb, var(--mat-sys-surface-container-high) 60%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-outline) 20%, transparent);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
   color: var(--mat-sys-on-surface);
-  border-right: 1px solid var(--mat-sys-outline-variant);
-  transition: width 0.3s ease-in-out;
+  transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow-x: hidden;
   white-space: nowrap;
+  z-index: 100;
+  box-sizing: border-box;
 }
 
 .sidenav:hover {
-  width: 250px;
+  width: 260px;
 }
 
 .content {
