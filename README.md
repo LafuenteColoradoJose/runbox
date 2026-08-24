@@ -42,14 +42,25 @@ Runbox utiliza un modelo jerárquico estándar en la industria para organizar la
 
 El proyecto cuenta con scripts bash para facilitar su gestión local en modo demonio (usando `pm2`):
 
-- **Arrancar el entorno (Frontend + Backend):**
+- **Arrancar el entorno de Desarrollo (Frontend + Backend):**
   ```bash
   ./start.sh
   ```
+  *(Nota: Para ejecutarlo de forma local pura con este script, el host necesita tener instalado `ansible` y `sshpass`).*
+
 - **Detener el entorno:**
   ```bash
   ./stop.sh
   ```
+
+### 🐳 Despliegue en Producción (Docker)
+
+Runbox está diseñado bajo una filosofía **"Plug & Play"** mediante contenedores. Gracias a su `Dockerfile`, **no necesitas instalar Ansible, Node.js ni bases de datos en tu servidor de producción**. El contenedor empaqueta su propio mini-sistema operativo con Ansible y la base de datos preinstalados. Sólo necesitas tener Docker y ejecutar:
+
+```bash
+docker build -t runbox .
+docker run -d -p 3000:3000 --name runbox runbox:latest
+```
 
 ---
 *Desarrollado para demostrar capacidades avanzadas en arquitectura web y gestión de inventarios.*

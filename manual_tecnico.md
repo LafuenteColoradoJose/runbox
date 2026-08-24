@@ -83,6 +83,9 @@ El proyecto contiene un `Dockerfile` optimizado (_multistage build_).
     *   Copia los estáticos de Angular dentro de `/backend/public`.
     *   Express sirve simultáneamente la API y los estáticos de Angular en el puerto `3000`.
 
+### Ventaja del Contenedor (Plug & Play)
+La principal ventaja de este despliegue es que **el contenedor es completamente autónomo**. Al instalar Ansible y SSHPass dentro de la imagen Docker en la etapa de producción, **no necesitas instalar Ansible ni Node.js en tu servidor físico o máquina host**. Simplemente necesitas tener instalado Docker; levantas el contenedor y la aplicación está lista para usarse, empaquetando todo el ecosistema y dependencias operativas en una sola caja.
+
 ### Comandos de Despliegue (Producción)
 ```bash
 # Construir la imagen
