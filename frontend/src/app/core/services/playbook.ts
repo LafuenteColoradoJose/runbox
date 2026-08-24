@@ -6,7 +6,12 @@ import { environment } from '../../../environments/environment';
 export interface Playbook {
   id: number;
   name: string;
-  path: string;
+  path?: string;
+  content?: string;
+  source_type?: string;
+  git_repo_url?: string;
+  git_branch?: string;
+  git_path?: string;
   description: string;
   organization_id?: number;
   organization_name?: string;

@@ -63,11 +63,21 @@ Al entrar a Runbox, verás un menú lateral con las principales opciones. Por de
 3. Haz clic en el botón de "Play" (Run) de color azul en la tarjeta deseada.
 4. El sistema creará un **Trabajo (Job)** y te redirigirá automáticamente a la pantalla de la consola.
 
-### 3. Visualización en Tiempo Real (Consola)
+### 3. Creación de Playbooks desde Git (GitOps)
+Además de los playbooks locales, los administradores pueden añadir playbooks alojados en repositorios Git externos.
+1. En la vista de **Playbooks**, pulsa sobre **New Playbook**.
+2. Rellena los datos básicos (Nombre, Inventario) y en el apartado de contenido, selecciona el tipo **Git Repository**.
+3. Deberás introducir:
+   * **URL del repositorio:** (Ej. `https://github.com/usuario/repo.git`)
+   * **Rama (Branch):** (Ej. `main` o `master`)
+   * **Archivo Playbook:** La ruta dentro del repositorio del archivo YAML (Ej. `playbooks/deploy.yaml`).
+4. Al ejecutarse, Runbox clonará este código, lanzará la automatización y luego eliminará los archivos residuales.
+
+### 4. Visualización en Tiempo Real (Consola)
 Una vez en la vista de *Job Detail*, observarás una terminal negra clásica.
 - No necesitas recargar la página; verás el texto aparecer línea a línea, tal y como si estuvieras delante del servidor de forma nativa.
 - El sistema captura y te muestra tanto los procesos exitosos de Ansible como los posibles errores.
 - Verás un botón (Badge) en la parte superior que indica el estado del Job: `En ejecución`, `Completado` o `Fallido`.
 
-### 4. Consultar Ejecuciones Pasadas
+### 5. Consultar Ejecuciones Pasadas
 Si te vas de la pantalla o cierras la pestaña por error, no te preocupes. Todo el progreso queda guardado en la base de datos de manera persistente. Si vuelves a ingresar a la URL del trabajo, el log histórico se cargará inmediatamente desde donde se quedó.

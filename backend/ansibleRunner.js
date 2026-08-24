@@ -4,8 +4,43 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-async function runPlaybook(playbookPath, io, jobId, inventoryId) {
+async function runPlaybook(playbook, io, jobId, inventoryId) {
   let inventoryPath = null;
+  let playbookExecutionPath = playbook.path;
+  let isTempPlaybook = false;
+
+  if (playbook.source_type === 'database') {
+    playbookExecutionPath = path.join(os.tmpdir(), `ansible_pb_${jobId}.yml`);
+    isTempPlaybook = true;
+    try {
+      await fs.promises.writeFile(playbookExecutionPath, playbook.content || '');
+    } catch (err) {
+      console.error('Error writing playbook file:', err);
+    }
+  } else if (playbook.source_type === 'git') {
+    const crypto = require('crypto');
+    const repoHash = crypto.createHash('md5').update(playbook.git_repo_url + (playbook.git_branch || 'main')).digest('hex');
+    const repoDir = path.join('/tmp/runbox_repos', repoHash);
+    
+    io.emit(`job-${jobId}-log`, { type: 'system', data: `\r\n[Sistema] Preparando repositorio Git...\r\n` });
+    
+    try {
+      if (!fs.existsSync('/tmp/runbox_repos')) {
+        fs.mkdirSync('/tmp/runbox_repos', { recursive: true });
+      }
+      
+      if (!fs.existsSync(repoDir)) {
+        cp.execSync(`git clone --branch ${playbook.git_branch || 'main'} --depth 1 ${playbook.git_repo_url} ${repoDir}`);
+      } else {
+        cp.execSync(`cd ${repoDir} && git fetch --depth 1 && git reset --hard origin/${playbook.git_branch || 'main'} && git clean -fd`);
+      }
+      playbookExecutionPath = path.join(repoDir, playbook.git_path);
+    } catch (err) {
+      const errorMsg = `\r\n[Error] Fallo al sincronizar repositorio Git: ${err.message}\r\n`;
+      io.emit(`job-${jobId}-log`, { type: 'error', data: errorMsg });
+      throw err;
+    }
+  }
   
   if (inventoryId) {
     inventoryPath = path.join(os.tmpdir(), `ansible_inv_${jobId}.ini`);
@@ -74,7 +109,7 @@ async function runPlaybook(playbookPath, io, jobId, inventoryId) {
     // Forzar colores de Ansible para que se vean bien en la terminal web
     const env = { ...process.env, PYTHONUNBUFFERED: '1', ANSIBLE_FORCE_COLOR: '1', ANSIBLE_HOST_KEY_CHECKING: 'False' };
     
-    const args = [playbookPath];
+    const args = [playbookExecutionPath];
     if (inventoryPath) {
       args.push('-i', inventoryPath);
     }
@@ -98,6 +133,9 @@ async function runPlaybook(playbookPath, io, jobId, inventoryId) {
     const cleanup = () => {
       if (inventoryPath) {
         fs.unlink(inventoryPath, () => {});
+      }
+      if (isTempPlaybook && playbookExecutionPath) {
+        fs.unlink(playbookExecutionPath, () => {});
       }
     };
 

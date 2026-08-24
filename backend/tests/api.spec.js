@@ -80,6 +80,7 @@ describe('API Endpoints', () => {
         .post('/api/playbooks')
         .set('Authorization', `Bearer ${token}`)
         .send({ name: 'Test Playbook API', path: '/test/path.yml' });
+      if (res.status !== 200) console.error('Create Playbook Error:', res.body);
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('name', 'Test Playbook API');
@@ -92,8 +93,43 @@ describe('API Endpoints', () => {
         .put(`/api/playbooks/${playbookId}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ name: 'Updated Playbook', path: '/test/updated.yml', organization_id: null });
+      if (res.status !== 200) console.error('Update Playbook Error:', res.body);
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('success', true);
+    });
+
+    it('should create a git playbook', async () => {
+      const res = await request(app)
+        .post('/api/playbooks')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ 
+          name: 'Git Playbook', 
+          source_type: 'git',
+          git_repo_url: 'https://github.com/test/repo.git',
+          git_branch: 'main',
+          git_path: 'playbook.yml'
+        });
+      if (res.status !== 200) console.error('Create Git Playbook Error:', res.body);
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('id');
+      expect(res.body).toHaveProperty('source_type', 'git');
+      expect(res.body).toHaveProperty('git_repo_url', 'https://github.com/test/repo.git');
+      expect(res.body).toHaveProperty('git_branch', 'main');
+      expect(res.body).toHaveProperty('git_path', 'playbook.yml');
+      const gitPlaybookId = res.body.id;
+      
+      const resUpdate = await request(app)
+        .put(`/api/playbooks/${gitPlaybookId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ 
+          name: 'Updated Git Playbook', 
+          source_type: 'git',
+          git_repo_url: 'https://github.com/test/repo2.git',
+          git_branch: 'develop',
+          git_path: 'site.yml'
+        });
+      expect(resUpdate.status).toBe(200);
+      expect(resUpdate.body).toHaveProperty('success', true);
     });
 
     it('should delete a playbook', async () => {

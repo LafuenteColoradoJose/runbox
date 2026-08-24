@@ -8,3 +8,13 @@
   width: 100%;
   margin-bottom: 15px;
 }
+
+.source-type-container {
+  margin-bottom: 20px;
+}
+
+.source-type-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

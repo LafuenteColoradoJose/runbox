@@ -165,10 +165,11 @@ app.get('/api/playbooks', authMiddleware, (req, res) => {
 
 app.post('/api/playbooks', authMiddleware, requireAdmin, (req, res) => {
   try {
-    const { name, path, organization_id } = req.body;
-    const stmt = db.prepare('INSERT INTO playbooks (name, path, organization_id) VALUES (?, ?, ?)');
-    const result = stmt.run(name, path, organization_id || null);
-    res.json({ id: result.lastInsertRowid, name, path, organization_id: organization_id || null });
+    const { name, path, content, source_type, git_repo_url, git_branch, git_path, organization_id } = req.body;
+    const stmt = db.prepare('INSERT INTO playbooks (name, path, content, source_type, git_repo_url, git_branch, git_path, organization_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+    const stType = source_type || 'local_path';
+    const result = stmt.run(name, path || null, content || null, stType, git_repo_url || null, git_branch || null, git_path || null, organization_id || null);
+    res.json({ id: result.lastInsertRowid, name, path, content, source_type: stType, git_repo_url, git_branch, git_path, organization_id: organization_id || null });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -176,9 +177,10 @@ app.post('/api/playbooks', authMiddleware, requireAdmin, (req, res) => {
 
 app.put('/api/playbooks/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
-    const { name, path, organization_id } = req.body;
-    db.prepare('UPDATE playbooks SET name = ?, path = ?, organization_id = ? WHERE id = ?').run(
-      name, path, organization_id || null, req.params.id
+    const { name, path, content, source_type, git_repo_url, git_branch, git_path, organization_id } = req.body;
+    const stType = source_type || 'local_path';
+    db.prepare('UPDATE playbooks SET name = ?, path = ?, content = ?, source_type = ?, git_repo_url = ?, git_branch = ?, git_path = ?, organization_id = ? WHERE id = ?').run(
+      name, path || null, content || null, stType, git_repo_url || null, git_branch || null, git_path || null, organization_id || null, req.params.id
     );
     res.json({ success: true });
   } catch (err) {
@@ -238,7 +240,7 @@ app.post('/api/playbooks/run', authMiddleware, async (req, res) => {
     const initMsg = `\r\n[Sistema] Iniciando ejecución de ${playbook.name} (Job #${jobId})...\r\n`;
     db.prepare('UPDATE jobs SET log_output = log_output || ? WHERE id = ?').run(initMsg, jobId);
     io.emit(`job-${jobId}-log`, { type: 'system', data: initMsg });
-    await runPlaybook(playbook.path, io, jobId, inventoryId);
+    await runPlaybook(playbook, io, jobId, inventoryId);
   } catch (err) {
     console.error('Error ejecutando playbook:', err);
   }

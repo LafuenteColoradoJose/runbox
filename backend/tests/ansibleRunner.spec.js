@@ -33,7 +33,7 @@ describe('ansibleRunner', () => {
   });
 
   it('should handle stdout and stderr data', async () => {
-    const promise = runPlaybook('/fake/path.yml', ioMock, jobId);
+    const promise = runPlaybook({ path: '/fake/path.yml' }, ioMock, jobId);
 
     setTimeout(() => {
       // Simulate stdout and stderr
@@ -60,7 +60,7 @@ describe('ansibleRunner', () => {
   it('should handle non-zero exit code', async () => {
     // Insert inventory to ensure cleanup() has a file to delete
     const invId = db.prepare('INSERT INTO inventories (name) VALUES (?)').run('Inv 1').lastInsertRowid;
-    const promise = runPlaybook('/fake/path.yml', ioMock, jobId, invId);
+    const promise = runPlaybook({ path: '/fake/path.yml' }, ioMock, jobId, invId);
     
     setTimeout(() => {
       childMock.emit('close', 1);
@@ -76,7 +76,7 @@ describe('ansibleRunner', () => {
   it('should handle process errors', async () => {
     // Insert inventory to ensure cleanup() has a file to delete
     const invId = db.prepare('INSERT INTO inventories (name) VALUES (?)').run('Inv 2').lastInsertRowid;
-    const promise = runPlaybook('/fake/path.yml', ioMock, jobId, invId);
+    const promise = runPlaybook({ path: '/fake/path.yml' }, ioMock, jobId, invId);
     
     setTimeout(() => {
       childMock.emit('error', new Error('Failed to start'));
@@ -106,7 +106,7 @@ describe('ansibleRunner', () => {
     // Insert host group
     db.prepare('INSERT INTO host_groups (host_id, group_id) VALUES (?, ?)').run(hostId, groupId);
     
-    const promise = runPlaybook('/fake/path.yml', ioMock, jobId, invId);
+    const promise = runPlaybook({ path: '/fake/path.yml' }, ioMock, jobId, invId);
     
     setTimeout(() => {
       // Simulate close with code 0
@@ -127,7 +127,7 @@ describe('ansibleRunner', () => {
     db.prepare('INSERT INTO hosts (inventory_id, name, ip_address, variables) VALUES (?, ?, ?, ?)').run(invId, 'badhost', '10.0.0.2', 'not json');
     db.prepare('INSERT INTO groups (inventory_id, name, variables) VALUES (?, ?, ?)').run(invId, 'badgroup', 'not json');
     
-    const promise = runPlaybook('/fake/path.yml', ioMock, jobId, invId);
+    const promise = runPlaybook({ path: '/fake/path.yml' }, ioMock, jobId, invId);
     
     setTimeout(() => {
       // Simulate close with code 0
@@ -135,6 +135,38 @@ describe('ansibleRunner', () => {
     }, 10);
     
     await promise;
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId);
+    expect(job.status).toBe('success');
+  });
+
+  it('should handle git source type and clone repo', async () => {
+    const fs = require('fs');
+    vi.spyOn(fs, 'existsSync').mockReturnValue(false); // Simulate repo doesn't exist
+    vi.spyOn(fs, 'mkdirSync').mockImplementation(() => {});
+    vi.spyOn(cp, 'execSync').mockImplementation(() => {});
+
+    const playbook = {
+      source_type: 'git',
+      git_repo_url: 'https://test.git',
+      git_branch: 'main',
+      git_path: 'site.yml'
+    };
+
+    const promise = runPlaybook(playbook, ioMock, jobId);
+    
+    setTimeout(() => {
+      childMock.emit('close', 0);
+    }, 10);
+    
+    await promise;
+
+    expect(cp.execSync).toHaveBeenCalledWith(expect.stringContaining('git clone'));
+    expect(cp.execSync).toHaveBeenCalledWith(expect.stringContaining('https://test.git'));
+    
+    // Check that spawn was called with the correct path
+    expect(cp.spawn).toHaveBeenCalled();
+    const args = cp.spawn.mock.calls[0][1];
+    expect(args[0]).toContain('site.yml');
     const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId);
     expect(job.status).toBe('success');
   });

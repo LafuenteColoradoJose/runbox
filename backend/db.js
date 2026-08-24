@@ -20,7 +20,12 @@ db.init = function() {
     CREATE TABLE IF NOT EXISTS playbooks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      path TEXT NOT NULL,
+      path TEXT,
+      content TEXT,
+      source_type TEXT DEFAULT 'local_path',
+      git_repo_url TEXT,
+      git_branch TEXT,
+      git_path TEXT,
       organization_id INTEGER,
       FOREIGN KEY(organization_id) REFERENCES organizations(id) ON DELETE SET NULL
     );
@@ -95,6 +100,14 @@ db.init = function() {
   const playbooksCols = db.prepare("PRAGMA table_info(playbooks)").all();
   if (!playbooksCols.find(c => c.name === 'organization_id')) {
     db.exec("ALTER TABLE playbooks ADD COLUMN organization_id INTEGER REFERENCES organizations(id) ON DELETE SET NULL");
+  }
+  if (!playbooksCols.find(c => c.name === 'source_type')) {
+    db.exec("ALTER TABLE playbooks ADD COLUMN source_type TEXT DEFAULT 'local_path'");
+  }
+  if (!playbooksCols.find(c => c.name === 'git_repo_url')) {
+    db.exec("ALTER TABLE playbooks ADD COLUMN git_repo_url TEXT");
+    db.exec("ALTER TABLE playbooks ADD COLUMN git_branch TEXT");
+    db.exec("ALTER TABLE playbooks ADD COLUMN git_path TEXT");
   }
 
   const jobsCols = db.prepare("PRAGMA table_info(jobs)").all();

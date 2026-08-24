@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatRadioModule } from '@angular/material/radio';
 import { Playbook, PlaybookService } from '../../core/services/playbook';
 import { InventoryService, Organization } from '../../core/services/inventory.service';
 
@@ -19,7 +20,8 @@ import { InventoryService, Organization } from '../../core/services/inventory.se
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule
+    MatButtonModule,
+    MatRadioModule
   ],
   templateUrl: './playbook-dialog.html',
   styleUrls: ['./playbook-dialog.css']
@@ -39,9 +41,47 @@ export class PlaybookDialog implements OnInit {
     this.isEditMode = !!data;
     this.playbookForm = this.fb.group({
       name: [data?.name || '', Validators.required],
-      path: [data?.path || '', Validators.required],
+      source_type: [data?.source_type || 'local_path'],
+      path: [data?.path || ''],
+      content: [data?.content || ''],
+      git_repo_url: [data?.git_repo_url || ''],
+      git_branch: [data?.git_branch || ''],
+      git_path: [data?.git_path || ''],
       organization_id: [data?.organization_id || null]
     });
+    
+    this.updateValidators();
+    this.playbookForm.get('source_type')?.valueChanges.subscribe(() => {
+      this.updateValidators();
+    });
+  }
+  
+  private updateValidators() {
+    const sourceType = this.playbookForm.get('source_type')?.value;
+    const pathControl = this.playbookForm.get('path');
+    const contentControl = this.playbookForm.get('content');
+    const gitRepoUrlControl = this.playbookForm.get('git_repo_url');
+    const gitPathControl = this.playbookForm.get('git_path');
+    const gitBranchControl = this.playbookForm.get('git_branch');
+    
+    pathControl?.clearValidators();
+    contentControl?.clearValidators();
+    gitRepoUrlControl?.clearValidators();
+    gitPathControl?.clearValidators();
+    
+    if (sourceType === 'local_path') {
+      pathControl?.setValidators([Validators.required]);
+    } else if (sourceType === 'database') {
+      contentControl?.setValidators([Validators.required]);
+    } else if (sourceType === 'git') {
+      gitRepoUrlControl?.setValidators([Validators.required]);
+      gitPathControl?.setValidators([Validators.required]);
+    }
+    
+    pathControl?.updateValueAndValidity();
+    contentControl?.updateValueAndValidity();
+    gitRepoUrlControl?.updateValueAndValidity();
+    gitPathControl?.updateValueAndValidity();
   }
 
   ngOnInit(): void {

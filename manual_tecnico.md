@@ -54,6 +54,8 @@ El servidor actúa como un puente entre la base de datos, el cliente web y los b
 
 *   **API REST**: Expone endpoints bajo `/api/` para listar playbooks y lanzar tareas (`POST /api/playbooks/:id/run`).
 *   **Base de Datos (SQLite)**: Se utiliza `better-sqlite3` por su sincronía, ideal para escrituras concurrentes de logs. La base de datos (`runbox.db`) consta de una tabla `jobs` con las columnas: `id`, `playbook_name`, `status`, `log_output`, `created_at` y `updated_at`.
+*   **GitOps (Integración Nativa)**: Mediante la librería `simple-git`, el backend clona de manera efímera repositorios Git al ejecutar un Playbook remoto y hace limpieza automáticamente para evitar consumo de disco innecesario y fugas de datos.
+
 *   **Ansible Runner**: Lógica encapsulada en `ansibleRunner.js`. Utiliza el módulo `child_process.spawn` nativo de Node.js.
     1. Lanza el proceso `ansible-playbook`.
     2. Escucha los eventos `data` de los streams `stdout` y `stderr`.

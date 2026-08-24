@@ -2,11 +2,17 @@
   <mat-card-header>
     <mat-icon mat-card-avatar class="playbook-icon">integration_instructions</mat-icon>
     <mat-card-title>{{ playbook().name }}</mat-card-title>
-    <mat-card-subtitle>{{ playbook().path }}</mat-card-subtitle>
+    <mat-card-subtitle>
+      @if (playbook().source_type === 'database') {
+        Código (Base de Datos)
+      } @else if (playbook().source_type === 'git') {
+        Git: {{ playbook().git_repo_url }}
+      } @else {
+        {{ playbook().path }}
+      }
+    </mat-card-subtitle>
   </mat-card-header>
-  <mat-card-content>
-    <p>{{ playbook().description || 'No description provided.' }}</p>
-  </mat-card-content>
+
   <mat-card-actions align="end">
     @if (isAdmin()) {
       <button mat-icon-button color="primary" (click)="onEdit.emit(playbook())" matTooltip="Editar">

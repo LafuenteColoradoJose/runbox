@@ -53,16 +53,33 @@ describe('PlaybookDialog', () => {
     expect(component.isEditMode).toBe(false);
   });
 
-  it('should invalidate form if name or path is empty', () => {
+  it('should invalidate form if name or local path is empty in local_path mode', () => {
+    component.playbookForm.controls['source_type'].setValue('local_path');
     component.playbookForm.controls['name'].setValue('');
     component.playbookForm.controls['path'].setValue('');
     expect(component.playbookForm.invalid).toBe(true);
   });
 
-  it('should validate form if all required fields are filled', () => {
+  it('should validate form if all required fields are filled for local_path', () => {
+    component.playbookForm.controls['source_type'].setValue('local_path');
     component.playbookForm.controls['name'].setValue('Valid Playbook');
     component.playbookForm.controls['path'].setValue('/path/to/pb.yml');
     expect(component.playbookForm.invalid).toBe(false);
+  });
+
+  it('should validate form for git source type', () => {
+    component.playbookForm.controls['source_type'].setValue('git');
+    component.playbookForm.controls['name'].setValue('Git Playbook');
+    component.playbookForm.controls['git_repo_url'].setValue('https://git/repo.git');
+    component.playbookForm.controls['git_path'].setValue('playbook.yml');
+    expect(component.playbookForm.invalid).toBe(false);
+  });
+
+  it('should invalidate form for git source type if repo url is missing', () => {
+    component.playbookForm.controls['source_type'].setValue('git');
+    component.playbookForm.controls['name'].setValue('Git Playbook');
+    component.playbookForm.controls['git_path'].setValue('playbook.yml');
+    expect(component.playbookForm.invalid).toBe(true);
   });
 
   it('should not call create or update if form is invalid on submit', () => {
@@ -74,12 +91,30 @@ describe('PlaybookDialog', () => {
   });
 
   it('should call createPlaybook and close dialog when no data is provided (create mode)', () => {
-    component.playbookForm.setValue({ name: 'New Playbook', path: '/path', organization_id: 1 });
+    component.playbookForm.setValue({ 
+      name: 'New Playbook', 
+      source_type: 'local_path',
+      path: '/path', 
+      content: '',
+      git_repo_url: '',
+      git_branch: '',
+      git_path: '',
+      organization_id: 1 
+    });
     playbookServiceSpy.createPlaybook.mockReturnValue(of({ id: 1, name: 'New Playbook', path: '/path', organization_id: 1, created_at: '', updated_at: '' }));
     
     component.onSubmit();
     
-    expect(playbookServiceSpy.createPlaybook).toHaveBeenCalledWith({ name: 'New Playbook', path: '/path', organization_id: 1 });
+    expect(playbookServiceSpy.createPlaybook).toHaveBeenCalledWith({ 
+      name: 'New Playbook', 
+      source_type: 'local_path',
+      path: '/path', 
+      content: '',
+      git_repo_url: '',
+      git_branch: '',
+      git_path: '',
+      organization_id: 1 
+    });
     expect(dialogRefSpy.close).toHaveBeenCalledWith(true);
   });
 });
@@ -109,7 +144,17 @@ describe('PlaybookDialog with DATA (edit mode)', () => {
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { 
           provide: MAT_DIALOG_DATA, 
-          useValue: { id: 5, name: 'Existing PB', path: '/existing/path', organization_id: 2 } 
+          useValue: { 
+            id: 5, 
+            name: 'Existing PB', 
+            source_type: 'git',
+            path: '', 
+            content: '',
+            git_repo_url: 'https://github.com/user/repo.git',
+            git_branch: 'main',
+            git_path: 'site.yml',
+            organization_id: 2 
+          } 
         },
         { provide: PlaybookService, useValue: playbookServiceSpy },
         { provide: InventoryService, useValue: inventoryServiceSpy },
@@ -126,17 +171,28 @@ describe('PlaybookDialog with DATA (edit mode)', () => {
   it('should initialize form with existing data in edit mode', () => {
     expect(component.isEditMode).toBe(true);
     expect(component.playbookForm.value.name).toBe('Existing PB');
-    expect(component.playbookForm.value.path).toBe('/existing/path');
+    expect(component.playbookForm.value.source_type).toBe('git');
+    expect(component.playbookForm.value.git_repo_url).toBe('https://github.com/user/repo.git');
     expect(component.playbookForm.value.organization_id).toBe(2);
   });
 
   it('should call updatePlaybook and close dialog on submit', () => {
-    component.playbookForm.setValue({ name: 'Updated PB', path: '/updated', organization_id: 2 });
-    playbookServiceSpy.updatePlaybook.mockReturnValue(of({ id: 5, name: 'Updated PB', path: '/updated', organization_id: 2, created_at: '', updated_at: '' }));
+    const updatedValue = { 
+      name: 'Updated PB', 
+      source_type: 'git',
+      path: '',
+      content: '',
+      git_repo_url: 'https://github.com/user/repo-updated.git',
+      git_branch: 'develop',
+      git_path: 'site.yml',
+      organization_id: 2 
+    };
+    component.playbookForm.setValue(updatedValue);
+    playbookServiceSpy.updatePlaybook.mockReturnValue(of({ id: 5, ...updatedValue, created_at: '', updated_at: '' }));
     
     component.onSubmit();
     
-    expect(playbookServiceSpy.updatePlaybook).toHaveBeenCalledWith(5, { name: 'Updated PB', path: '/updated', organization_id: 2 });
+    expect(playbookServiceSpy.updatePlaybook).toHaveBeenCalledWith(5, updatedValue);
     expect(dialogRefSpy.close).toHaveBeenCalledWith(true);
   });
 });
