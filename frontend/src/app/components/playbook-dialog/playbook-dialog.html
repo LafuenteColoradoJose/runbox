@@ -1,0 +1,34 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Editar Playbook' : 'Añadir Playbook' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="playbookForm" class="dialog-form">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" placeholder="Ej: Actualizar Servidores" required>
+      <mat-error *ngIf="playbookForm.get('name')?.hasError('required')">El nombre es obligatorio</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Ruta (Path absoluto en servidor)</mat-label>
+      <input matInput formControlName="path" placeholder="/etc/ansible/playbooks/site.yml" required>
+      <mat-error *ngIf="playbookForm.get('path')?.hasError('required')">La ruta es obligatoria</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Organización (Opcional - Dejar vacío para Global)</mat-label>
+      <mat-select formControlName="organization_id">
+        <mat-option [value]="null">--- Playbook Global ---</mat-option>
+        <mat-option *ngFor="let org of organizations" [value]="org.id">
+          {{ org.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="playbookForm.invalid" (click)="onSubmit()">
+    {{ isEditMode ? 'Guardar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

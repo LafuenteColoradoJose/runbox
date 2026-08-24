@@ -69,4 +69,55 @@ describe('PlaybookService', () => {
     expect(req.request.method).toBe('GET');
     req.flush(mockJob);
   });
+
+  it('should create a playbook', () => {
+    const newPlaybook = { name: 'New pb', path: '/path' };
+    const mockRes = { id: 2, ...newPlaybook, description: '', created_at: 'now' };
+    
+    service.createPlaybook(newPlaybook).subscribe(pb => {
+      expect(pb).toEqual(mockRes);
+    });
+
+    const req = httpMock.expectOne(req => req.url.includes('/playbooks') && req.method === 'POST');
+    expect(req.request.body).toEqual(newPlaybook);
+    req.flush(mockRes);
+  });
+
+  it('should update a playbook', () => {
+    const update = { name: 'Updated pb' };
+    
+    service.updatePlaybook(1, update).subscribe(res => {
+      expect(res.success).toBe(true);
+    });
+
+    const req = httpMock.expectOne(req => req.url.includes('/playbooks/1'));
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(update);
+    req.flush({ success: true });
+  });
+
+  it('should delete a playbook', () => {
+    service.deletePlaybook(1).subscribe(res => {
+      expect(res.success).toBe(true);
+    });
+
+    const req = httpMock.expectOne(req => req.url.includes('/playbooks/1'));
+    expect(req.request.method).toBe('DELETE');
+    req.flush({ success: true });
+  });
+
+  it('should run a playbook with inventoryId', () => {
+    const mockJob: Job = {
+      id: 2, playbook_id: 1, status: 'running', log_output: '', created_at: 'now', updated_at: 'now'
+    };
+    
+    service.runPlaybook(1, 5).subscribe(res => {
+      expect(res.job).toEqual(mockJob);
+    });
+
+    const req = httpMock.expectOne(req => req.url.includes('/playbooks/run'));
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ id: 1, inventoryId: 5 });
+    req.flush({ message: 'Playbook iniciado', job: mockJob });
+  });
 });

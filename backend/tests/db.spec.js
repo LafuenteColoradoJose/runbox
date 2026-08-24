@@ -2,24 +2,17 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
+process.env.TEST_DB_NAME = 'runbox.db.spec.db';
+import db from '../db.js';
+
 describe('db initialization', () => {
   const testDbName = 'runbox.db.spec.db';
   const dbPath = path.join(__dirname, '..', testDbName);
   const testPlaybookPath = path.join(__dirname, '..', 'test.yml');
 
   beforeEach(() => {
-    process.env.TEST_DB_NAME = testDbName;
-    // Ensure clean state before each test
-    if (fs.existsSync(dbPath)) {
-      fs.unlinkSync(dbPath);
-    }
-    if (fs.existsSync(testPlaybookPath)) {
-      fs.unlinkSync(testPlaybookPath);
-    }
-    
-    // Clear require cache to force db.js to execute again
-    delete require.cache[require.resolve('../db.js')];
-    vi.resetModules();
+    // We don't delete the DB or testPlaybook here anymore 
+    // because db.js evaluated at the top level already created them!
   });
 
   afterEach(() => {
@@ -33,8 +26,17 @@ describe('db initialization', () => {
   });
 
   it('should initialize database and seed admin user and test playbook', () => {
-    // Importing db.js will run the initialization
-    const db = require('../db.js');
+    // Force playbook creation to test it properly
+    db.exec('PRAGMA foreign_keys = OFF');
+    db.exec('DELETE FROM jobs');
+    db.exec('DELETE FROM playbooks');
+    db.exec('PRAGMA foreign_keys = ON');
+    if (fs.existsSync(testPlaybookPath)) {
+      fs.unlinkSync(testPlaybookPath);
+    }
+    
+    // Run initialization manually
+    db.init();
 
     // Check if user was created
     const userStmt = db.prepare('SELECT * FROM users WHERE username = ?');
@@ -73,5 +75,57 @@ describe('db initialization', () => {
     const host = hostStmt.get('web-01-dummy.local');
     expect(host).toBeDefined();
     expect(host.inventory_id).toBe(inv.id);
+  });
+
+  it('should not seed data if already exists', () => {
+    // Get counts before second init
+    const usersCount = db.prepare('SELECT count(*) as c FROM users').get().c;
+    const playbooksCount = db.prepare('SELECT count(*) as c FROM playbooks').get().c;
+    const orgsCount = db.prepare('SELECT count(*) as c FROM organizations').get().c;
+
+    // Run init again
+    db.init();
+
+    // Counts should be the same
+    expect(db.prepare('SELECT count(*) as c FROM users').get().c).toBe(usersCount);
+    expect(db.prepare('SELECT count(*) as c FROM playbooks').get().c).toBe(playbooksCount);
+    expect(db.prepare('SELECT count(*) as c FROM organizations').get().c).toBe(orgsCount);
+  });
+
+  it('should add missing columns and recreate dummy data if missing', () => {
+    // Disable foreign keys temporarily to clear data
+    db.exec('PRAGMA foreign_keys = OFF');
+    db.exec('DELETE FROM jobs');
+    db.exec('DELETE FROM host_groups');
+    db.exec('DELETE FROM hosts');
+    db.exec('DELETE FROM groups');
+    db.exec('DELETE FROM inventories');
+    db.exec('DELETE FROM user_organizations');
+    db.exec('DELETE FROM organizations');
+    db.exec('DELETE FROM playbooks');
+    db.exec('DELETE FROM users');
+    db.exec('PRAGMA foreign_keys = ON');
+
+    // Drop columns to hit the ALTER TABLE branches
+    try { db.exec('ALTER TABLE playbooks DROP COLUMN organization_id'); } catch(e){}
+    try { db.exec('ALTER TABLE jobs DROP COLUMN user_id'); } catch(e){}
+    
+    if (fs.existsSync(testPlaybookPath)) {
+      fs.unlinkSync(testPlaybookPath);
+    }
+    
+    // Run init
+    db.init();
+    
+    // Check columns
+    const playbooksCols = db.prepare("PRAGMA table_info(playbooks)").all();
+    expect(playbooksCols.find(c => c.name === 'organization_id')).toBeDefined();
+    
+    const jobsCols = db.prepare("PRAGMA table_info(jobs)").all();
+    expect(jobsCols.find(c => c.name === 'user_id')).toBeDefined();
+    
+    // Check dummy data
+    const orgsCount = db.prepare('SELECT count(*) as c FROM organizations').get().c;
+    expect(orgsCount).toBeGreaterThan(0);
   });
 });

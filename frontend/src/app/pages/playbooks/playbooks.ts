@@ -1,15 +1,21 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { PlaybookService, Playbook } from '../../core/services/playbook';
 import { PlaybookCard } from '../../components/playbook-card/playbook-card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../core/services/auth';
+import { PlaybookDialog } from '../../components/playbook-dialog/playbook-dialog';
+import { PlaybookRunDialog } from '../../components/playbook-run-dialog/playbook-run-dialog';
 
 @Component({
   selector: 'app-playbooks',
   standalone: true,
-  imports: [PlaybookCard, MatProgressSpinnerModule, MatSnackBarModule],
+  imports: [PlaybookCard, MatProgressSpinnerModule, MatSnackBarModule, MatDialogModule, MatButtonModule, MatIconModule],
   templateUrl: './playbooks.html',
   styleUrl: './playbooks.css',
 })
@@ -17,11 +23,19 @@ export class Playbooks implements OnInit {
   private playbookService = inject(PlaybookService);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
 
   playbooks = signal<Playbook[]>([]);
   loading = signal<boolean>(true);
+  isAdmin = computed(() => this.auth.currentUser()?.role === 'admin');
 
   ngOnInit() {
+    this.loadPlaybooks();
+  }
+
+  loadPlaybooks() {
+    this.loading.set(true);
     this.playbookService.getPlaybooks().subscribe({
       next: (data) => {
         this.playbooks.set(data);
@@ -38,18 +52,53 @@ export class Playbooks implements OnInit {
   }
 
   runPlaybook(playbook: Playbook) {
-    this.snackBar.open('Iniciando ' + playbook.name + '...', '', { duration: 1500 });
-    this.playbookService.runPlaybook(playbook.id).subscribe({
-      next: (res) => {
-        this.router.navigate(['/jobs', res.job.id]);
-      },
-      error: (err) => {
-        /* eslint-disable */ console.error(
-          ...oo_tx(`1143381044_45_8_45_52_11`, 'Error running playbook', err),
-        );
-        this.snackBar.open('Error al ejecutar playbook', 'Cerrar', { duration: 3000 });
-      },
+    const dialogRef = this.dialog.open(PlaybookRunDialog, {
+      width: '500px'
     });
+
+    dialogRef.afterClosed().subscribe(inventoryId => {
+      if (inventoryId !== undefined) {
+        this.snackBar.open('Iniciando ' + playbook.name + '...', '', { duration: 1500 });
+        this.playbookService.runPlaybook(playbook.id, inventoryId?.inventoryId).subscribe({
+          next: (res) => {
+            this.router.navigate(['/jobs', res.job.id]);
+          },
+          error: (err) => {
+            console.error('Error running playbook', err);
+            this.snackBar.open('Error al ejecutar playbook', 'Cerrar', { duration: 3000 });
+          },
+        });
+      }
+    });
+  }
+
+  openDialog(playbook?: Playbook) {
+    const dialogRef = this.dialog.open(PlaybookDialog, {
+      width: '500px',
+      data: playbook || null
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.snackBar.open(playbook ? 'Playbook actualizado' : 'Playbook creado', 'Cerrar', { duration: 3000 });
+        this.loadPlaybooks();
+      }
+    });
+  }
+
+  deletePlaybook(playbook: Playbook) {
+    if (confirm(`¿Estás seguro de que deseas eliminar el playbook "${playbook.name}"?`)) {
+      this.playbookService.deletePlaybook(playbook.id).subscribe({
+        next: () => {
+          this.snackBar.open('Playbook eliminado', 'Cerrar', { duration: 3000 });
+          this.loadPlaybooks();
+        },
+        error: (err) => {
+          console.error('Error deleting playbook', err);
+          this.snackBar.open('Error al eliminar playbook', 'Cerrar', { duration: 3000 });
+        }
+      });
+    }
   }
 }
 /* istanbul ignore next */ /* c8 ignore start */ /* eslint-disable */ function oo_cm() {

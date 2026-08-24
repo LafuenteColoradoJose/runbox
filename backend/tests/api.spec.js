@@ -60,6 +60,108 @@ describe('API Endpoints', () => {
     });
   });
 
+  describe('Auth Errors', () => {
+    it('should return 401 for invalid credentials', async () => {
+      const res = await request(app).post('/api/auth/login').send({ username: 'administrator', password: 'wrongpassword' });
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty('error', 'Credenciales inválidas');
+    });
+    it('should return 401 for non-existent user', async () => {
+      const res = await request(app).post('/api/auth/login').send({ username: 'nobody', password: 'password' });
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty('error', 'Credenciales inválidas');
+    });
+  });
+
+  describe('Playbooks CRUD', () => {
+    let playbookId;
+    it('should create a playbook', async () => {
+      const res = await request(app)
+        .post('/api/playbooks')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Test Playbook API', path: '/test/path.yml' });
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('id');
+      expect(res.body).toHaveProperty('name', 'Test Playbook API');
+      expect(res.body).toHaveProperty('path', '/test/path.yml');
+      playbookId = res.body.id;
+    });
+
+    it('should update a playbook', async () => {
+      const res = await request(app)
+        .put(`/api/playbooks/${playbookId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Updated Playbook', path: '/test/updated.yml', organization_id: null });
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('success', true);
+    });
+
+    it('should delete a playbook', async () => {
+      const res = await request(app)
+        .delete(`/api/playbooks/${playbookId}`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('success', true);
+    });
+
+    it('should return 500 when database fails', async () => {
+      const db = require('../db');
+      const originalPrepare = db.prepare;
+      db.prepare = vi.fn().mockImplementation(() => { throw new Error('DB Error'); });
+      
+      const res = await request(app)
+        .post('/api/playbooks')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Fail Playbook', path: '/fail' });
+      
+      expect(res.status).toBe(500);
+      expect(res.body).toHaveProperty('error', 'DB Error');
+      
+      db.prepare = originalPrepare;
+    });
+  });
+
+  describe('Users API', () => {
+    let userId;
+    
+    it('should list users', async () => {
+      const res = await request(app)
+        .get('/api/users')
+        .set('Authorization', `Bearer ${token}`);
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThan(0);
+    });
+
+    it('should create a user', async () => {
+      const dynamicUsername = `testuser_${Date.now()}`;
+      const res = await request(app)
+        .post('/api/users')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ username: dynamicUsername, password: 'password123', role: 'viewer', organizations: [] });
+      expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty('id');
+      userId = res.body.id;
+    });
+
+    it('should update a user', async () => {
+      const res = await request(app)
+        .put(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ role: 'admin', organizations: [] });
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('success', true);
+    });
+
+    it('should delete a user', async () => {
+      const res = await request(app)
+        .delete(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('success', true);
+    });
+  });
+
   describe('Static Files', () => {
     it('should serve index.html for unknown non-api routes', async () => {
       const response = await request(app).get('/some-random-route');

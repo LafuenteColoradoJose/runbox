@@ -35,12 +35,13 @@ describe('ansibleRunner', () => {
   it('should handle stdout and stderr data', async () => {
     const promise = runPlaybook('/fake/path.yml', ioMock, jobId);
 
-    // Simulate stdout and stderr
-    childMock.stdout.emit('data', 'some output');
-    childMock.stderr.emit('data', 'some error');
-    
-    // Simulate close with code 0
-    childMock.emit('close', 0);
+    setTimeout(() => {
+      // Simulate stdout and stderr
+      childMock.stdout.emit('data', 'some output');
+      childMock.stderr.emit('data', 'some error');
+      // Simulate close with code 0
+      childMock.emit('close', 0);
+    }, 10);
 
     await promise;
 
@@ -57,9 +58,13 @@ describe('ansibleRunner', () => {
   });
 
   it('should handle non-zero exit code', async () => {
-    const promise = runPlaybook('/fake/path.yml', ioMock, jobId);
+    // Insert inventory to ensure cleanup() has a file to delete
+    const invId = db.prepare('INSERT INTO inventories (name) VALUES (?)').run('Inv 1').lastInsertRowid;
+    const promise = runPlaybook('/fake/path.yml', ioMock, jobId, invId);
     
-    childMock.emit('close', 1);
+    setTimeout(() => {
+      childMock.emit('close', 1);
+    }, 10);
 
     await expect(promise).rejects.toThrow('Exit code 1');
     expect(ioMock.emit).toHaveBeenCalledWith(`job-${jobId}-status`, { status: 'failed' });
@@ -69,9 +74,13 @@ describe('ansibleRunner', () => {
   });
 
   it('should handle process errors', async () => {
-    const promise = runPlaybook('/fake/path.yml', ioMock, jobId);
+    // Insert inventory to ensure cleanup() has a file to delete
+    const invId = db.prepare('INSERT INTO inventories (name) VALUES (?)').run('Inv 2').lastInsertRowid;
+    const promise = runPlaybook('/fake/path.yml', ioMock, jobId, invId);
     
-    childMock.emit('error', new Error('Failed to start'));
+    setTimeout(() => {
+      childMock.emit('error', new Error('Failed to start'));
+    }, 10);
 
     await expect(promise).rejects.toThrow('Failed to start');
     expect(ioMock.emit).toHaveBeenCalledWith(`job-${jobId}-status`, { status: 'error' });
@@ -79,5 +88,54 @@ describe('ansibleRunner', () => {
     const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId);
     expect(job.status).toBe('error');
     expect(job.log_output).toContain('Failed to start');
+  });
+
+  it('should generate inventory and clean it up', async () => {
+    // Insert inventory
+    const insertInv = db.prepare('INSERT INTO inventories (name) VALUES (?)');
+    const invId = insertInv.run('Test Inv').lastInsertRowid;
+    
+    // Insert host
+    const insertHost = db.prepare('INSERT INTO hosts (inventory_id, name, ip_address, variables) VALUES (?, ?, ?, ?)');
+    const hostId = insertHost.run(invId, 'testhost', '10.0.0.1', JSON.stringify({ myvar: "value" })).lastInsertRowid;
+    
+    // Insert group
+    const insertGroup = db.prepare('INSERT INTO groups (inventory_id, name, variables) VALUES (?, ?, ?)');
+    const groupId = insertGroup.run(invId, 'testgroup', JSON.stringify({ gvar: 123 })).lastInsertRowid;
+    
+    // Insert host group
+    db.prepare('INSERT INTO host_groups (host_id, group_id) VALUES (?, ?)').run(hostId, groupId);
+    
+    const promise = runPlaybook('/fake/path.yml', ioMock, jobId, invId);
+    
+    setTimeout(() => {
+      // Simulate close with code 0
+      childMock.emit('close', 0);
+    }, 10);
+    
+    await promise;
+    
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId);
+    expect(job.status).toBe('success');
+    expect(cp.spawn).toHaveBeenCalled();
+    const args = cp.spawn.mock.calls[0][1];
+    expect(args).toContain('-i');
+  });
+
+  it('should ignore invalid json in variables gracefully', async () => {
+    const invId = db.prepare('INSERT INTO inventories (name) VALUES (?)').run('Bad Inv').lastInsertRowid;
+    db.prepare('INSERT INTO hosts (inventory_id, name, ip_address, variables) VALUES (?, ?, ?, ?)').run(invId, 'badhost', '10.0.0.2', 'not json');
+    db.prepare('INSERT INTO groups (inventory_id, name, variables) VALUES (?, ?, ?)').run(invId, 'badgroup', 'not json');
+    
+    const promise = runPlaybook('/fake/path.yml', ioMock, jobId, invId);
+    
+    setTimeout(() => {
+      // Simulate close with code 0
+      childMock.emit('close', 0);
+    }, 10);
+    
+    await promise;
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId);
+    expect(job.status).toBe('success');
   });
 });

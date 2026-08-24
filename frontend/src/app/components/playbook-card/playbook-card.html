@@ -8,6 +8,14 @@
     <p>{{ playbook().description || 'No description provided.' }}</p>
   </mat-card-content>
   <mat-card-actions align="end">
+    @if (isAdmin()) {
+      <button mat-icon-button color="primary" (click)="onEdit.emit(playbook())" matTooltip="Editar">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" (click)="onDelete.emit(playbook())" matTooltip="Eliminar">
+        <mat-icon>delete</mat-icon>
+      </button>
+    }
     <button mat-flat-button color="primary" (click)="onRun.emit(playbook())" class="run-btn">
       <mat-icon>play_arrow</mat-icon> Lanza Playbook
     </button>

@@ -163,9 +163,41 @@ app.get('/api/playbooks', authMiddleware, (req, res) => {
   res.json(playbooks);
 });
 
+app.post('/api/playbooks', authMiddleware, requireAdmin, (req, res) => {
+  try {
+    const { name, path, organization_id } = req.body;
+    const stmt = db.prepare('INSERT INTO playbooks (name, path, organization_id) VALUES (?, ?, ?)');
+    const result = stmt.run(name, path, organization_id || null);
+    res.json({ id: result.lastInsertRowid, name, path, organization_id: organization_id || null });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/playbooks/:id', authMiddleware, requireAdmin, (req, res) => {
+  try {
+    const { name, path, organization_id } = req.body;
+    db.prepare('UPDATE playbooks SET name = ?, path = ?, organization_id = ? WHERE id = ?').run(
+      name, path, organization_id || null, req.params.id
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/playbooks/:id', authMiddleware, requireAdmin, (req, res) => {
+  try {
+    db.prepare('DELETE FROM playbooks WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Ejecutar playbook
 app.post('/api/playbooks/run', authMiddleware, async (req, res) => {
-  const { id } = req.body;
+  const { id, inventoryId } = req.body;
   const stmt = db.prepare('SELECT * FROM playbooks WHERE id = ?');
   const playbook = stmt.get(id);
   
@@ -181,6 +213,20 @@ app.post('/api/playbooks/run', authMiddleware, async (req, res) => {
     }
   }
 
+  // Comprobar autorización del inventario si se ha proporcionado
+  if (inventoryId) {
+    const inventory = db.prepare('SELECT * FROM inventories WHERE id = ?').get(inventoryId);
+    if (!inventory) {
+      return res.status(404).json({ error: 'Inventario no encontrado' });
+    }
+    if (req.user.role !== 'admin' && inventory.organization_id !== null) {
+      const hasAccess = db.prepare(`SELECT 1 FROM user_organizations WHERE user_id = ? AND organization_id = ?`).get(req.user.id, inventory.organization_id);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'No tienes acceso a este inventario' });
+      }
+    }
+  }
+
   const insertJob = db.prepare(`INSERT INTO jobs (playbook_id, user_id, status) VALUES (?, ?, 'running')`);
   const result = insertJob.run(playbook.id, req.user.id);
   const jobId = result.lastInsertRowid;
@@ -192,7 +238,7 @@ app.post('/api/playbooks/run', authMiddleware, async (req, res) => {
     const initMsg = `\r\n[Sistema] Iniciando ejecución de ${playbook.name} (Job #${jobId})...\r\n`;
     db.prepare('UPDATE jobs SET log_output = log_output || ? WHERE id = ?').run(initMsg, jobId);
     io.emit(`job-${jobId}-log`, { type: 'system', data: initMsg });
-    await runPlaybook(playbook.path, io, jobId);
+    await runPlaybook(playbook.path, io, jobId, inventoryId);
   } catch (err) {
     console.error('Error ejecutando playbook:', err);
   }

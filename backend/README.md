@@ -7,6 +7,7 @@ Este es el directorio del backend de **Runbox**, la API y orquestador basado en 
 *   **Orquestación de Ansible**: Utiliza los procesos hijos (`child_process.spawn`) nativos de Node.js para ejecutar y controlar las tareas del sistema operativo y Ansible.
 *   **WebSockets**: Implementa `socket.io` en el servidor HTTP para transmitir a los clientes (Frontend) las ejecuciones en tiempo real de los playbooks.
 *   **Persistencia Síncrona**: Base de datos **SQLite** usando la librería `better-sqlite3`. Esto garantiza que, incluso bajo una gran presión de logs por stdout/stderr, las inserciones en la base de datos se hacen de manera segura y ordenada antes de ser transmitidas.
+*   **Testing Automatizado**: Cobertura de código exhaustiva mediante `Vitest`, simulando adecuadamente `child_process` y la base de datos para ejecutar tests unitarios deterministas y robustos.
 
 ## Comandos de Desarrollo
 

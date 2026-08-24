@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>Ejecutar Playbook</h2>
+<mat-dialog-content>
+  <p>Selecciona un inventario para ejecutar este playbook. Puedes dejarlo en blanco si el playbook no requiere inventario o si usa 'localhost'.</p>
+
+  <mat-form-field appearance="outline" style="width: 100%; margin-top: 16px;">
+    <mat-label>Inventario (Opcional)</mat-label>
+    <mat-select [ngModel]="selectedInventoryId()" (ngModelChange)="selectedInventoryId.set($event)">
+      <mat-option [value]="null">-- Sin Inventario --</mat-option>
+      @for (inv of inventories(); track inv.id) {
+        <mat-option [value]="inv.id">{{ inv.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="onRun()">Ejecutar</button>
+</mat-dialog-actions>

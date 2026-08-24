@@ -1,6 +1,13 @@
 <div class="page-header">
-  <h1>Playbooks</h1>
-  <p>Manage and execute your Ansible playbooks</p>
+  <div class="header-content">
+    <h1>Playbooks</h1>
+    <p>Manage and execute your Ansible playbooks</p>
+  </div>
+  @if (isAdmin()) {
+    <button mat-raised-button color="primary" class="add-btn" (click)="openDialog()">
+      <mat-icon>add</mat-icon> Añadir Playbook
+    </button>
+  }
 </div>
 
 @if (loading()) {
@@ -12,7 +19,10 @@
     @for (playbook of playbooks(); track playbook.id) {
       <app-playbook-card 
         [playbook]="playbook" 
-        (onRun)="runPlaybook($event)">
+        [isAdmin]="isAdmin()"
+        (onRun)="runPlaybook($event)"
+        (onEdit)="openDialog($event)"
+        (onDelete)="deletePlaybook($event)">
       </app-playbook-card>
     } @empty {
       <div class="empty-state">

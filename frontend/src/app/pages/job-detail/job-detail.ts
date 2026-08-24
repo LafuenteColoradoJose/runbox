@@ -1,28 +1,35 @@
 import { Component, OnInit, OnDestroy, ViewChild, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { TerminalViewer } from '../../components/terminal-viewer/terminal-viewer';
 import { StatusBadge } from '../../components/status-badge/status-badge';
 import { PlaybookService, Job } from '../../core/services/playbook';
 import { SocketService } from '../../core/services/socket';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-job-detail',
   standalone: true,
-  imports: [CommonModule, TerminalViewer, StatusBadge, MatProgressSpinnerModule],
+  imports: [CommonModule, TerminalViewer, StatusBadge, MatProgressSpinnerModule, MatButtonModule, MatIconModule],
   templateUrl: './job-detail.html',
   styleUrl: './job-detail.css',})
 export class JobDetail implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private playbookService = inject(PlaybookService);
   private socketService = inject(SocketService);
+  private location = inject(Location);
 
   @ViewChild('terminal') terminal!: TerminalViewer;
 
   jobId: number = 0;
   job = signal<Job | null>(null);
   loading = signal<boolean>(true);
+
+  goBack() {
+    this.location.back();
+  }
 
   ngOnInit() {
     this.jobId = Number(this.route.snapshot.paramMap.get('id'));

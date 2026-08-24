@@ -15,11 +15,19 @@
       border-radius: 8px;
       border: 1px solid var(--mat-sys-outline-variant);
     }
-    .job-title {
+    .job-title-wrapper {
       display: flex;
       align-items: center;
       gap: 16px;
       margin-bottom: 8px;
+    }
+    .back-btn {
+      /* Uses default mat-stroked-button color now */
+    }
+    .job-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
     .job-title h2 {
       margin: 0;

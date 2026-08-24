@@ -3,8 +3,8 @@
 **Runbox** es una plataforma de desarrollo interno (Internal Developer Platform - IDP) ligera que facilita y democratiza la ejecución de Infraestructura como Código (IaC). Permite organizar y operar entornos, automatizaciones y playbooks mediante un portal web intuitivo y de autoservicio.
 
 Este proyecto ha sido desarrollado con una arquitectura robusta orientada a un entorno empresarial:
-- **Backend:** Node.js, Express, Better-SQLite3
-- **Frontend:** Angular 19, Material Design, ECharts (Topología de redes)
+- **Backend:** Node.js, Express, Better-SQLite3, Vitest (Testing)
+- **Frontend:** Angular 22, Material Design, ECharts (Topología y Dashboard de métricas), Vitest (Testing)
 
 > [!NOTE]
 > **Credenciales de Acceso (Pruebas Locales):**

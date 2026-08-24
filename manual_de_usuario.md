@@ -55,10 +55,10 @@ Esto levantará tanto la base de datos como los servidores locales. Cuando termi
 ## 🌐 Uso de la Aplicación Web
 
 ### 1. Navegación Principal
-Al entrar a Runbox, verás un menú lateral con las principales opciones. Por defecto, aterrizarás en el listado de **Playbooks**.
+Al entrar a Runbox, verás un menú lateral con las principales opciones. Por defecto, aterrizarás en el **Dashboard** principal, donde tendrás una vista panorámica (métricas y gráficas) del estado de tu infraestructura y los últimos trabajos (Jobs) lanzados. Desde el menú lateral podrás acceder a Playbooks, Inventarios, Organizaciones (si tienes permisos) y Usuarios (solo Administradores).
 
 ### 2. Ejecución de un Playbook
-1. Ve a la sección **Playbooks**.
+1. Ve a la sección **Playbooks** en el menú lateral.
 2. Verás tarjetas (Cards) listando todas las automatizaciones disponibles (ej. *Dummy Playbook (Test)*, *Actualizar Servidores Web*).
 3. Haz clic en el botón de "Play" (Run) de color azul en la tarjeta deseada.
 4. El sistema creará un **Trabajo (Job)** y te redirigirá automáticamente a la pantalla de la consola.

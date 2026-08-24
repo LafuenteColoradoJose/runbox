@@ -40,10 +40,11 @@ Tanto la API como el Frontend (UI) se coordinan para el control de acceso:
 El frontend está estructurado siguiendo las mejores prácticas de Angular moderno (sin `NgModules`). 
 *   **App Shell**: Utiliza Angular Material para proporcionar un `Sidenav` y un `Toolbar` persistentes.
 *   **Enrutamiento**: Declarativo en `app.routes.ts`.
+    *   `/dashboard`: Vista principal con gráficas (ECharts) de métricas del sistema, hosts y trabajos recientes.
     *   `/playbooks`: Muestra la cuadrícula (Grid) de Playbooks disponibles.
     *   `/jobs/:id`: Muestra la consola en tiempo real (Xterm.js) para un trabajo en ejecución.
 *   **WebSockets**: Implementados a través de un servicio inyectable (`SocketService`) que gestiona la conexión bidireccional con el servidor para la captura de logs (`log_stream` y `job_status`).
-*   **Consola**: `TerminalViewerComponent` monta una terminal de `xterm.js`. El redimensionamiento se maneja con `ResizeObserver` y `requestAnimationFrame` para evitar sobrecargas de rendimiento en el DOM y errores de "ResizeObserver loop limit exceeded".
+*   **Consola y Gráficos**: `TerminalViewerComponent` monta una terminal de `xterm.js` con soporte para ResizeObserver. Además, se utilizan componentes visuales con `ngx-echarts` para monitorización de estados.
 
 ---
 
@@ -58,6 +59,16 @@ El servidor actúa como un puente entre la base de datos, el cliente web y los b
     2. Escucha los eventos `data` de los streams `stdout` y `stderr`.
     3. Concatena los logs y hace un `UPDATE` síncrono en la base de datos (columna `log_output`).
     4. Inmediatamente después, emite el payload por Socket.io al cliente conectado a la "sala" (`room`) correspondiente al `jobId`.
+
+---
+
+## 🧪 Testing y Calidad de Código
+
+Runbox implementa un sólido enfoque de pruebas automatizadas en ambos extremos de la pila (Backend y Frontend), alcanzando una cobertura de código (Test Coverage) superior al 80% y garantizando que el sistema sea estable para su uso en producción.
+
+*   **Framework de Testing:** Se utiliza **Vitest** en ambos entornos, en lugar de frameworks tradicionales como Jest o Karma/Jasmine, debido a su velocidad (basado en Vite), API compatible y capacidades modernas.
+*   **Backend:** Los tests se enfocan en las operaciones sobre la base de datos (SQLite), el control de acceso de las rutas (middlewares de RBAC) y el módulo aislable de `ansibleRunner`. Dependencias externas y procesos hijos (`child_process`) son simulados mediante Mocks de Vitest para garantizar un aislamiento total sin depender de Ansible instalado.
+*   **Frontend:** Se testean extensivamente los componentes y servicios de Angular usando `TestBed` integrado con Vitest. Elementos del navegador como `ResizeObserver` y librerías de UI pesadas (ej. diálogos de Material, WebSockets o ECharts) son apropiadamente mockeados para asegurar rápidez y aislamiento en los tests unitarios.
 
 ---
 

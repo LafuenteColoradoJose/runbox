@@ -117,6 +117,7 @@ db.init = function() {
   const countStmt = db.prepare('SELECT count(*) as count FROM playbooks');
   const { count } = countStmt.get();
   if (count === 0) {
+    console.log('--- SEEDING TEST PLAYBOOK NOW ---');
     const testPlaybookPath = path.join(__dirname, 'test.yml');
     if (!fs.existsSync(testPlaybookPath)) {
       fs.writeFileSync(testPlaybookPath, `---
@@ -143,6 +144,7 @@ db.init = function() {
   const orgCountStmt = db.prepare('SELECT count(*) as count FROM organizations');
   const { count: orgCount } = orgCountStmt.get();
   if (orgCount === 0) {
+    console.log('--- SEEDING DUMMY INVENTORY DATA NOW ---');
     console.log('Seeding dummy inventory data...');
     // Organización
     const insertOrg = db.prepare('INSERT INTO organizations (name) VALUES (?)');

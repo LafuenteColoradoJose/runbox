@@ -13,5 +13,9 @@ import { Playbook } from '../../core/services/playbook';
 })
 export class PlaybookCard {
   playbook = input.required<Playbook>();
+  isAdmin = input<boolean>(false);
+  
   onRun = output<Playbook>();
+  onEdit = output<Playbook>();
+  onDelete = output<Playbook>();
 }
