@@ -2,7 +2,7 @@
   <div class="org-header">
     <h1>Organizations</h1>
     @if (authService.currentUser()?.role === 'admin') {
-      <button mat-flat-button color="primary" (click)="openDialog()">
+      <button mat-fab extended color="primary" (click)="openDialog()">
         <mat-icon>add</mat-icon> Add Organization
       </button>
     }
