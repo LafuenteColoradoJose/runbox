@@ -16,7 +16,7 @@
   </div>
 } @else {
   <div class="playbooks-grid">
-    @for (playbook of playbooks(); track playbook.id) {
+    @for (playbook of pagedPlaybooks(); track playbook.id) {
       <app-playbook-card 
         [playbook]="playbook" 
         [isAdmin]="isAdmin()"
@@ -30,4 +30,12 @@
       </div>
     }
   </div>
+  
+  <mat-paginator 
+    [length]="playbooks().length"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="[10, 25, 50, 100]"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
 }

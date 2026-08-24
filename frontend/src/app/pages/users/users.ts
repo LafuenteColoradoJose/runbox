@@ -1,39 +1,63 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService, User, UserOrganization } from '../../core/services/user';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatChipsModule } from '@angular/material/chips';
+import { UserDialog } from '../../features/users/user-dialog/user-dialog';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatDialogModule,
+    MatChipsModule
+  ],
   templateUrl: './users.html',
   styleUrls: ['./users.css']
 })
 export class Users implements OnInit {
   userService = inject(UserService);
   private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
 
   users = this.userService.users;
   organizations = signal<any[]>([]);
 
-  showModal = signal(false);
-  isEditing = signal(false);
-  
-  formData = signal({
-    id: 0,
-    username: '',
-    password: '',
-    role: 'user' as 'admin' | 'user',
-    organizations: [] as number[]
-  });
+  dataSource = new MatTableDataSource<User>([]);
+  displayedColumns: string[] = ['id', 'username', 'role', 'organizations', 'actions'];
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  constructor() {
+    effect(() => {
+      this.dataSource.data = this.users();
+    });
+  }
 
   ngOnInit() {
     this.userService.loadUsers().subscribe();
     this.loadOrganizations();
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   loadOrganizations() {
@@ -43,63 +67,37 @@ export class Users implements OnInit {
   }
 
   openCreateModal() {
-    this.isEditing.set(false);
-    this.formData.set({
-      id: 0,
-      username: '',
-      password: '',
-      role: 'user',
-      organizations: []
+    const dialogRef = this.dialog.open(UserDialog, {
+      width: '500px',
+      data: { user: null, organizations: this.organizations() }
     });
-    this.showModal.set(true);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.userService.createUser(result).subscribe();
+      }
+    });
   }
 
   openEditModal(user: User) {
-    this.isEditing.set(true);
-    this.formData.set({
-      id: user.id,
-      username: user.username,
-      password: '', // Leave blank, only update if changed
-      role: user.role,
-      organizations: user.organizations?.map(o => o.id) || []
+    const dialogRef = this.dialog.open(UserDialog, {
+      width: '500px',
+      data: { user, organizations: this.organizations() }
     });
-    this.showModal.set(true);
-  }
 
-  closeModal() {
-    this.showModal.set(false);
-  }
-
-  toggleOrganization(orgId: number) {
-    const current = this.formData().organizations;
-    if (current.includes(orgId)) {
-      this.formData.update(data => ({ ...data, organizations: current.filter(id => id !== orgId) }));
-    } else {
-      this.formData.update(data => ({ ...data, organizations: [...current, orgId] }));
-    }
-  }
-
-  saveUser() {
-    const data = this.formData();
-    const payload: any = {
-      username: data.username,
-      role: data.role,
-      organizations: data.organizations
-    };
-
-    if (data.password) {
-      payload.password = data.password;
-    }
-
-    if (this.isEditing()) {
-      this.userService.updateUser(data.id, payload).subscribe(() => {
-        this.closeModal();
-      });
-    } else {
-      this.userService.createUser(payload).subscribe(() => {
-        this.closeModal();
-      });
-    }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const payload: any = {
+          username: result.username,
+          role: result.role,
+          organizations: result.organizations
+        };
+        if (result.password) {
+          payload.password = result.password;
+        }
+        this.userService.updateUser(user.id, payload).subscribe();
+      }
+    });
   }
 
   deleteUser(id: number) {

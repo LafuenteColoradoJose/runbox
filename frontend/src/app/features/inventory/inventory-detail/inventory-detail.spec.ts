@@ -85,8 +85,8 @@ describe('InventoryDetail', () => {
     expect(component).toBeTruthy();
     expect(component.inventoryId).toBe(1);
     expect(component.inventory?.name).toBe('Test Inventory');
-    expect(component.hosts.length).toBe(1);
-    expect(component.groups.length).toBe(1);
+    expect(component.hostsDataSource.data.length).toBe(1);
+    expect(component.groupsDataSource.data.length).toBe(1);
     expect(component.hostColumns).toEqual(['name', 'ip_address', 'groups', 'actions']);
     expect(component.groupColumns).toEqual(['id', 'name', 'actions']);
   });

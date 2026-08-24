@@ -1,6 +1,8 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, ViewChild, AfterViewInit } from '@angular/core';
 
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -10,18 +12,21 @@ import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-organizations-list',
-  imports: [MatTableModule, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [MatTableModule, MatPaginatorModule, MatSortModule, MatButtonModule, MatIconModule, MatDialogModule],
   templateUrl: './organizations-list.html',
   styleUrl: './organizations-list.css',
 })
-export class OrganizationsList implements OnInit {
+export class OrganizationsList implements OnInit, AfterViewInit {
   private inventoryService = inject(InventoryService);
   private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
   public authService = inject(AuthService);
 
-  organizations: Organization[] = [];
+  dataSource = new MatTableDataSource<Organization>([]);
   displayedColumns: string[] = ['id', 'name', 'actions'];
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
     if (this.authService.currentUser()?.role !== 'admin') {
@@ -30,9 +35,14 @@ export class OrganizationsList implements OnInit {
     this.loadOrganizations();
   }
 
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
   loadOrganizations() {
     this.inventoryService.getOrganizations().subscribe((data) => {
-      this.organizations = data;
+      this.dataSource.data = data;
       this.cdr.markForCheck();
     });
   }

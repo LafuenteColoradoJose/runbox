@@ -2,181 +2,60 @@
   display: flex;
   min-height: 100vh;
   width: 100%;
-  background: #0f172a;
-  position: relative;
-  overflow: hidden;
+  background: var(--mat-sys-surface-container);
   align-items: center;
   justify-content: center;
 }
 
-/* Dynamic Animated Background */
-.bg-shape {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
-  z-index: 0;
-  opacity: 0.6;
-}
-
-.shape-1 {
-  width: 500px;
-  height: 500px;
-  background: #3b82f6; /* Blue */
-  top: -200px;
-  right: -100px;
-  animation: float1 15s infinite alternate ease-in-out;
-}
-
-.shape-2 {
-  width: 600px;
-  height: 600px;
-  background: #8b5cf6; /* Purple */
-  bottom: -300px;
-  left: -200px;
-  animation: float2 18s infinite alternate ease-in-out;
-}
-
-.shape-3 {
-  width: 300px;
-  height: 300px;
-  background: #06b6d4; /* Cyan */
-  top: 30%;
-  left: 20%;
-  animation: float3 12s infinite alternate ease-in-out;
-}
-
-@keyframes float1 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-100px, 100px) scale(1.1); }
-}
-@keyframes float2 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(150px, -150px) scale(1.2); }
-}
-@keyframes float3 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-80px, -50px) scale(1.15); }
-}
-
-/* Glassmorphism Card */
-.glass-card {
-  position: relative;
-  z-index: 10;
+.login-card {
   width: 100%;
   max-width: 440px;
   margin: 20px;
-  padding: 48px;
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-@keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
+  padding: 24px;
 }
 
 .login-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .logo-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 ::ng-deep .logo-container .logo-text {
-  color: white !important;
   font-size: 2rem !important;
 }
 
 ::ng-deep .logo-container .logo-icon {
-  color: #60a5fa !important; /* Lighter blue */
   width: 32px !important;
   height: 32px !important;
-}
-
-.login-header h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin: 0 0 8px 0;
-  color: #f8fafc;
-  letter-spacing: -0.5px;
-}
-
-.login-header p {
-  font-size: 1rem;
-  color: #94a3b8;
-  margin: 0;
+  color: var(--mat-sys-primary) !important;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-::ng-deep .custom-field {
+.full-width {
   width: 100%;
-}
-
-::ng-deep .custom-field .mat-mdc-text-field-wrapper {
-  background-color: rgba(15, 23, 42, 0.6) !important;
-  border-radius: 12px;
-}
-
-::ng-deep .custom-field .mat-mdc-form-field-outline {
-  display: none;
-}
-
-::ng-deep .custom-field .mdc-text-field--outlined .mdc-notched-outline {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-::ng-deep .custom-field .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
-::ng-deep .custom-field .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
-::ng-deep .custom-field .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-::ng-deep .custom-field .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__leading,
-::ng-deep .custom-field .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__notch,
-::ng-deep .custom-field .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__trailing {
-  border-color: #3b82f6 !important;
-}
-
-::ng-deep .custom-field input {
-  color: #f8fafc !important;
-}
-
-::ng-deep .custom-field mat-label {
-  color: #94a3b8 !important;
-}
-
-::ng-deep .custom-field mat-icon {
-  color: #64748b !important;
-}
-
-::ng-deep .custom-field.mat-focused mat-icon {
-  color: #3b82f6 !important;
 }
 
 .error-message {
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  padding: 14px 16px;
-  border-radius: 12px;
+  background-color: color-mix(in srgb, var(--mat-sys-error) 12%, transparent);
+  color: var(--mat-sys-error);
+  padding: 12px 16px;
+  border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 500;
   animation: shake 0.5s ease-in-out;
@@ -189,30 +68,13 @@
 }
 
 .form-actions {
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .submit-btn {
   width: 100%;
-  padding: 26px 0 !important;
+  padding: 24px 0 !important;
   font-size: 1.1rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.5px;
-  border-radius: 12px !important;
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  color: white !important;
-}
-
-.submit-btn:hover:not([disabled]) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5) !important;
-  background: linear-gradient(135deg, #60a5fa, #3b82f6) !important;
-}
-
-.submit-btn:disabled {
-  background: rgba(148, 163, 184, 0.2) !important;
-  color: rgba(248, 250, 252, 0.4) !important;
 }
 
 .spinner {

@@ -6,6 +6,7 @@ import { UserService } from '../../core/services/user';
 import { of } from 'rxjs';
 import { signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('Users', () => {
   let component: Users;
@@ -23,7 +24,7 @@ describe('Users', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [Users],
+      imports: [Users, NoopAnimationsModule],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -55,116 +56,69 @@ describe('Users', () => {
     const req = httpTestingController.expectOne(`${environment.apiUrl}/organizations`);
     req.flush([]);
     
+    const dialogSpy = vi.spyOn(component['dialog'], 'open').mockReturnValue({
+      afterClosed: () => of(null)
+    } as any);
+
     component.openCreateModal();
-    expect(component.isEditing()).toBe(false);
-    expect(component.showModal()).toBe(true);
-    expect(component.formData().id).toBe(0);
-    expect(component.formData().username).toBe('');
+    expect(dialogSpy).toHaveBeenCalled();
   });
 
   it('should open edit modal', () => {
     const req = httpTestingController.expectOne(`${environment.apiUrl}/organizations`);
     req.flush([]);
     
+    const dialogSpy = vi.spyOn(component['dialog'], 'open').mockReturnValue({
+      afterClosed: () => of(null)
+    } as any);
+
     const userToEdit: any = { id: 5, username: 'edituser', role: 'admin', organizations: [{id: 10, name: 'Org 1'}] };
     component.openEditModal(userToEdit);
-    expect(component.isEditing()).toBe(true);
-    expect(component.showModal()).toBe(true);
-    expect(component.formData().id).toBe(5);
-    expect(component.formData().username).toBe('edituser');
-    expect(component.formData().organizations).toEqual([10]);
+    expect(dialogSpy).toHaveBeenCalled();
   });
 
-  it('should close modal', () => {
+  it('should create new user from dialog result', () => {
     const req = httpTestingController.expectOne(`${environment.apiUrl}/organizations`);
     req.flush([]);
 
-    component.showModal.set(true);
-    component.closeModal();
-    expect(component.showModal()).toBe(false);
-  });
-
-  it('should toggle organizations in formData', () => {
-    const req = httpTestingController.expectOne(`${environment.apiUrl}/organizations`);
-    req.flush([]);
-
-    component.formData.set({ ...component.formData(), organizations: [1] });
-    
-    // Add org 2
-    component.toggleOrganization(2);
-    expect(component.formData().organizations).toEqual([1, 2]);
-
-    // Remove org 1
-    component.toggleOrganization(1);
-    expect(component.formData().organizations).toEqual([2]);
-  });
-
-  it('should create new user', () => {
-    const req = httpTestingController.expectOne(`${environment.apiUrl}/organizations`);
-    req.flush([]);
+    vi.spyOn(component['dialog'], 'open').mockReturnValue({
+      afterClosed: () => of({
+        username: 'newuser',
+        password: 'password123',
+        role: 'user',
+        organizations: [1]
+      })
+    } as any);
 
     component.openCreateModal();
-    component.formData.set({
-      id: 0,
-      username: 'newuser',
-      password: 'password123',
-      role: 'user',
-      organizations: [1]
-    });
-    
-    component.saveUser();
     expect(mockUserService.createUser).toHaveBeenCalledWith({
       username: 'newuser',
       password: 'password123',
       role: 'user',
       organizations: [1]
     });
-    expect(component.showModal()).toBe(false);
   });
 
-  it('should update existing user without password', () => {
+  it('should update existing user from dialog result', () => {
     const req = httpTestingController.expectOne(`${environment.apiUrl}/organizations`);
     req.flush([]);
 
-    component.openEditModal({ id: 2, username: 'old', role: 'user', organizations: [] } as any);
-    component.formData.set({
-      id: 2,
-      username: 'updated',
-      password: '',
-      role: 'admin',
-      organizations: []
-    });
-    
-    component.saveUser();
-    expect(mockUserService.updateUser).toHaveBeenCalledWith(2, {
-      username: 'updated',
-      role: 'admin',
-      organizations: []
-    });
-    expect(component.showModal()).toBe(false);
-  });
-
-  it('should update existing user with password', () => {
-    const req = httpTestingController.expectOne(`${environment.apiUrl}/organizations`);
-    req.flush([]);
+    vi.spyOn(component['dialog'], 'open').mockReturnValue({
+      afterClosed: () => of({
+        username: 'updated',
+        password: 'newpassword',
+        role: 'admin',
+        organizations: []
+      })
+    } as any);
 
     component.openEditModal({ id: 2, username: 'old', role: 'user', organizations: [] } as any);
-    component.formData.set({
-      id: 2,
-      username: 'updated',
-      password: 'newpassword',
-      role: 'admin',
-      organizations: []
-    });
-    
-    component.saveUser();
     expect(mockUserService.updateUser).toHaveBeenCalledWith(2, {
       username: 'updated',
       password: 'newpassword',
       role: 'admin',
       organizations: []
     });
-    expect(component.showModal()).toBe(false);
   });
 
   it('should delete user on confirmation', () => {

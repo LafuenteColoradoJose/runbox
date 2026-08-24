@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -7,6 +7,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { NgxEchartsDirective } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 
@@ -26,6 +29,8 @@ import { GroupDialog } from '../group-dialog/group-dialog';
     MatIconModule,
     MatChipsModule,
     MatDialogModule,
+    MatPaginatorModule,
+    MatSortModule,
     NgxEchartsDirective,
   ],
   templateUrl: './inventory-detail.html',
@@ -41,12 +46,18 @@ export class InventoryDetail implements OnInit {
   inventoryId!: number;
   inventory?: Inventory;
 
-  hosts: Host[] = [];
-  groups: Group[] = [];
+  hostsDataSource = new MatTableDataSource<Host>([]);
+  groupsDataSource = new MatTableDataSource<Group>([]);
   chartOption: EChartsOption = {};
 
   hostColumns: string[] = ['name', 'ip_address', 'groups', 'actions'];
   groupColumns: string[] = ['id', 'name', 'actions'];
+
+  @ViewChild('hostPaginator') hostPaginator!: MatPaginator;
+  @ViewChild('hostSort') hostSort!: MatSort;
+  
+  @ViewChild('groupPaginator') groupPaginator!: MatPaginator;
+  @ViewChild('groupSort') groupSort!: MatSort;
 
   constructor() {
     if (this.authService.currentUser()?.role !== 'admin') {
@@ -74,14 +85,18 @@ export class InventoryDetail implements OnInit {
 
   loadHosts() {
     this.inventoryService.getHostsByInventory(this.inventoryId).subscribe((data) => {
-      this.hosts = data;
+      this.hostsDataSource.data = data;
+      this.hostsDataSource.paginator = this.hostPaginator;
+      this.hostsDataSource.sort = this.hostSort;
       this.cdr.markForCheck();
     });
   }
 
   loadGroups() {
     this.inventoryService.getGroupsByInventory(this.inventoryId).subscribe((data) => {
-      this.groups = data;
+      this.groupsDataSource.data = data;
+      this.groupsDataSource.paginator = this.groupPaginator;
+      this.groupsDataSource.sort = this.groupSort;
       this.cdr.markForCheck();
     });
   }

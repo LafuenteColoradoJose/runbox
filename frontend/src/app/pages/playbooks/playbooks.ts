@@ -5,6 +5,7 @@ import { PlaybookService, Playbook } from '../../core/services/playbook';
 import { PlaybookCard } from '../../components/playbook-card/playbook-card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,7 +16,7 @@ import { PlaybookRunDialog } from '../../components/playbook-run-dialog/playbook
 @Component({
   selector: 'app-playbooks',
   standalone: true,
-  imports: [PlaybookCard, MatProgressSpinnerModule, MatSnackBarModule, MatDialogModule, MatButtonModule, MatIconModule],
+  imports: [PlaybookCard, MatProgressSpinnerModule, MatSnackBarModule, MatDialogModule, MatButtonModule, MatIconModule, MatPaginatorModule],
   templateUrl: './playbooks.html',
   styleUrl: './playbooks.css',
 })
@@ -29,6 +30,19 @@ export class Playbooks implements OnInit {
   playbooks = signal<Playbook[]>([]);
   loading = signal<boolean>(true);
   isAdmin = computed(() => this.auth.currentUser()?.role === 'admin');
+
+  pageSize = signal(10);
+  pageIndex = signal(0);
+
+  pagedPlaybooks = computed(() => {
+    const startIndex = this.pageIndex() * this.pageSize();
+    return this.playbooks().slice(startIndex, startIndex + this.pageSize());
+  });
+
+  onPageChange(event: PageEvent) {
+    this.pageSize.set(event.pageSize);
+    this.pageIndex.set(event.pageIndex);
+  }
 
   ngOnInit() {
     this.loadPlaybooks();

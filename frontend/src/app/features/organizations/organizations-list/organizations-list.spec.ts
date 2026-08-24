@@ -3,6 +3,7 @@ import { OrganizationsList } from './organizations-list';
 import { InventoryService } from '../../../core/services/inventory.service';
 import { AuthService } from '../../../core/services/auth';
 import { MatDialog } from '@angular/material/dialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
 describe('OrganizationsList', () => {
@@ -11,7 +12,6 @@ describe('OrganizationsList', () => {
   
   let mockInventoryService: any;
   let mockAuthService: any;
-  let mockDialog: any;
 
   beforeEach(async () => {
     mockInventoryService = {
@@ -23,20 +23,11 @@ describe('OrganizationsList', () => {
       currentUser: vi.fn().mockReturnValue({ role: 'admin' })
     };
 
-    mockDialog = {
-      open: vi.fn().mockReturnValue({
-        afterClosed: vi.fn().mockReturnValue(of(true))
-      })
-    };
-
-    TestBed.overrideProvider(MatDialog, { useValue: mockDialog });
-
     await TestBed.configureTestingModule({
-      imports: [OrganizationsList],
+      imports: [OrganizationsList, NoopAnimationsModule],
       providers: [
         { provide: InventoryService, useValue: mockInventoryService },
-        { provide: AuthService, useValue: mockAuthService },
-        { provide: MatDialog, useValue: mockDialog }
+        { provide: AuthService, useValue: mockAuthService }
       ]
     }).compileComponents();
     
@@ -51,7 +42,7 @@ describe('OrganizationsList', () => {
 
   it('should create and load organizations', () => {
     expect(component).toBeTruthy();
-    expect(component.organizations.length).toBe(1);
+    expect(component.dataSource.data.length).toBe(1);
     expect(component.displayedColumns).toEqual(['id', 'name', 'actions']);
   });
 
@@ -62,16 +53,20 @@ describe('OrganizationsList', () => {
   });
 
   it('should open dialog and reload on close with result', () => {
+    const dialogSpy = vi.spyOn(component['dialog'], 'open').mockReturnValue({
+      afterClosed: () => of(true)
+    } as any);
     const loadSpy = vi.spyOn(component, 'loadOrganizations');
+    
     component.openDialog();
-    expect(mockDialog.open).toHaveBeenCalled();
+    expect(dialogSpy).toHaveBeenCalled();
     expect(loadSpy).toHaveBeenCalled();
   });
 
   it('should open dialog and not reload if closed without result', () => {
-    mockDialog.open.mockReturnValue({
-      afterClosed: vi.fn().mockReturnValue(of(false))
-    });
+    const dialogSpy = vi.spyOn(component['dialog'], 'open').mockReturnValue({
+      afterClosed: () => of(false)
+    } as any);
     const loadSpy = vi.spyOn(component, 'loadOrganizations');
     
     component.openDialog();

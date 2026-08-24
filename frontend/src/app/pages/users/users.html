@@ -5,126 +5,79 @@
       <p class="subtitle">Administra los usuarios y sus permisos en organizaciones</p>
     </div>
     <div class="header-actions">
-      <button class="primary-btn" (click)="openCreateModal()">
+      <button mat-flat-button color="primary" (click)="openCreateModal()">
         <mat-icon>person_add</mat-icon>
         Nuevo Usuario
       </button>
     </div>
   </div>
 
-  <div class="data-table-container">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Usuario</th>
-          <th>Rol</th>
-          <th>Organizaciones</th>
-          <th class="actions-col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (user of users(); track user.id) {
-          <tr>
-            <td>{{ user.id }}</td>
-            <td class="primary-cell">{{ user.username }}</td>
-            <td>
-              <span class="status-badge" [class.success]="user.role === 'admin'" [class.info]="user.role === 'user'">
-                {{ user.role === 'admin' ? 'Administrador' : 'Usuario' }}
-              </span>
-            </td>
-            <td>
-              @if (user.role === 'admin') {
-                <span class="tag">Todas (Global)</span>
-              } @else if (user.organizations && user.organizations.length > 0) {
-                <div class="tags-container">
-                  @for (org of user.organizations; track org.id) {
-                    <span class="tag">{{ org.name }}</span>
-                  }
-                </div>
-              } @else {
-                <span class="text-muted">Ninguna</span>
+  <div class="mat-elevation-z2 table-container">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+        <td mat-cell *matCellDef="let user"> {{user.id}} </td>
+      </ng-container>
+
+      <!-- Username Column -->
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Usuario </th>
+        <td mat-cell *matCellDef="let user" class="primary-cell"> {{user.username}} </td>
+      </ng-container>
+
+      <!-- Role Column -->
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Rol </th>
+        <td mat-cell *matCellDef="let user">
+          <span class="status-badge" [class.success]="user.role === 'admin'" [class.info]="user.role === 'user'">
+            {{ user.role === 'admin' ? 'Administrador' : 'Usuario' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Organizations Column -->
+      <ng-container matColumnDef="organizations">
+        <th mat-header-cell *matHeaderCellDef> Organizaciones </th>
+        <td mat-cell *matCellDef="let user">
+          @if (user.role === 'admin') {
+            <mat-chip-set>
+              <mat-chip color="primary" highlighted>Todas (Global)</mat-chip>
+            </mat-chip-set>
+          } @else if (user.organizations && user.organizations.length > 0) {
+            <mat-chip-set>
+              @for (org of user.organizations; track org.id) {
+                <mat-chip>{{ org.name }}</mat-chip>
               }
-            </td>
-            <td class="actions-cell">
-              <button class="icon-btn" (click)="openEditModal(user)" title="Editar">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button class="icon-btn danger" (click)="deleteUser(user.id)" title="Eliminar">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="5" class="empty-state">No hay usuarios registrados</td>
-          </tr>
-        }
-      </tbody>
+            </mat-chip-set>
+          } @else {
+            <span class="text-muted">Ninguna</span>
+          }
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-col"> Acciones </th>
+        <td mat-cell *matCellDef="let user" class="actions-cell">
+          <button mat-icon-button color="primary" (click)="openEditModal(user)" title="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteUser(user.id)" title="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="5" class="empty-state">No hay usuarios registrados</td>
+      </tr>
     </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Seleccionar página de usuarios"></mat-paginator>
   </div>
 </div>
-
-<!-- Modal Form -->
-@if (showModal()) {
-  <div class="modal-backdrop" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ isEditing() ? 'Editar Usuario' : 'Crear Usuario' }}</h2>
-        <button class="icon-btn" (click)="closeModal()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        <form (ngSubmit)="saveUser()" #userForm="ngForm">
-          
-          <div class="form-group">
-            <label for="username">Nombre de Usuario</label>
-            <input type="text" id="username" name="username" [(ngModel)]="formData().username" required class="form-control">
-          </div>
-
-          <div class="form-group">
-            <label for="password">Contraseña {{ isEditing() ? '(dejar en blanco para no cambiar)' : '' }}</label>
-            <input type="password" id="password" name="password" [(ngModel)]="formData().password" [required]="!isEditing()" class="form-control">
-          </div>
-
-          <div class="form-group">
-            <label for="role">Rol</label>
-            <select id="role" name="role" [(ngModel)]="formData().role" class="form-control">
-              <option value="user">Usuario normal</option>
-              <option value="admin">Administrador</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Organizaciones Asignadas</label>
-            @if (formData().role === 'admin') {
-              <div class="text-muted" style="font-size: 0.875rem; padding: 8px 0;">
-                Los administradores tienen acceso global a todas las organizaciones.
-              </div>
-            } @else {
-              <div class="checkbox-list">
-                @for (org of organizations(); track org.id) {
-                  <label class="checkbox-label">
-                    <input type="checkbox" 
-                           [checked]="formData().organizations.includes(org.id)"
-                           (change)="toggleOrganization(org.id)">
-                    {{ org.name }}
-                  </label>
-                }
-              </div>
-            }
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="secondary-btn" (click)="closeModal()">Cancelar</button>
-            <button type="submit" class="primary-btn" [disabled]="!userForm.form.valid">
-              {{ isEditing() ? 'Guardar Cambios' : 'Crear Usuario' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-}

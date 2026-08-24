@@ -11,7 +11,7 @@ Este documento describe la arquitectura técnica, las decisiones de diseño y la
 El proyecto utiliza una arquitectura basada en un **Monorepo** con NPM Workspaces que divide la aplicación en dos grandes módulos: `frontend` y `backend`.
 
 ### Stack Tecnológico
-*   **Frontend**: Angular 22 (Standalone Components, Signals-ready), Angular Material, RxJS, Socket.io-client, Xterm.js.
+*   **Frontend**: Angular 22 (Standalone Components, Signals-ready), Angular Material 3 (con Theming Dinámico M3), RxJS, Socket.io-client, Xterm.js.
 *   **Backend**: Node.js v22, Express, Socket.io, better-sqlite3.
 *   **Sistema y Orquestación**: Ansible, SSHPass.
 *   **Infraestructura**: Docker (Multistage Build).
@@ -40,7 +40,7 @@ Tanto la API como el Frontend (UI) se coordinan para el control de acceso:
 El frontend está estructurado siguiendo las mejores prácticas de Angular moderno (sin `NgModules`). 
 *   **App Shell**: Utiliza Angular Material para proporcionar un `Sidenav` y un `Toolbar` persistentes.
 *   **Enrutamiento**: Declarativo en `app.routes.ts`.
-    *   `/dashboard`: Vista principal con gráficas (ECharts) de métricas del sistema, hosts y trabajos recientes.
+    *   `/dashboard`: Vista principal con gráficas (ECharts) de métricas del sistema, hosts y trabajos recientes. Todas las tablas incluyen soporte para paginación y ordenamiento.
     *   `/playbooks`: Muestra la cuadrícula (Grid) de Playbooks disponibles.
     *   `/jobs/:id`: Muestra la consola en tiempo real (Xterm.js) para un trabajo en ejecución.
 *   **WebSockets**: Implementados a través de un servicio inyectable (`SocketService`) que gestiona la conexión bidireccional con el servidor para la captura de logs (`log_stream` y `job_status`).

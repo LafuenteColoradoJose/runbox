@@ -1,0 +1,44 @@
+<h2 mat-dialog-title>{{ isEditing ? 'Editar Usuario' : 'Crear Usuario' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="userForm" class="dialog-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre de Usuario</mat-label>
+      <input matInput formControlName="username" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Contraseña {{ isEditing ? '(dejar en blanco para no cambiar)' : '' }}</mat-label>
+      <input matInput formControlName="password" type="password">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Rol</mat-label>
+      <mat-select formControlName="role">
+        <mat-option value="user">Usuario normal</mat-option>
+        <mat-option value="admin">Administrador</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    @if (isAdmin) {
+      <div class="info-message">
+        <mat-icon color="primary">info</mat-icon>
+        <span>Los administradores tienen acceso global a todas las organizaciones.</span>
+      </div>
+    } @else {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Organizaciones Asignadas</mat-label>
+        <mat-select formControlName="organizations" multiple>
+          @for (org of organizations; track org.id) {
+            <mat-option [value]="org.id">{{ org.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="onSave()" [disabled]="userForm.invalid">
+    {{ isEditing ? 'Guardar Cambios' : 'Crear Usuario' }}
+  </button>
+</mat-dialog-actions>

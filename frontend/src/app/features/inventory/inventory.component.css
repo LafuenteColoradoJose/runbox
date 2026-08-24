@@ -70,7 +70,7 @@
 }
 
 .host-row:hover {
-  background-color: rgba(128, 128, 128, 0.1);
+  background-color: var(--mat-sys-surface-container-highest);
 }
 
 .empty-cell {
@@ -83,9 +83,9 @@
 .group-chip {
   min-height: 24px;
   font-size: 12px;
-  background-color: rgba(63, 81, 181, 0.1) !important;
-  color: #3f51b5 !important;
-  border: 1px solid rgba(63, 81, 181, 0.2);
+  background-color: var(--mat-sys-secondary-container) !important;
+  color: var(--mat-sys-on-secondary-container) !important;
+  border: 1px solid var(--mat-sys-outline-variant);
 }
 
 /* Modo Topología */
@@ -202,7 +202,7 @@
 }
 
 .primary-link {
-  color: #3b82f6;
+  color: var(--mat-sys-primary);
   text-decoration: none;
   cursor: pointer;
 }
@@ -232,18 +232,19 @@
 }
 
 .org-chip {
-  background-color: rgba(76, 175, 80, 0.1) !important;
-  color: #4caf50 !important;
-  border: 1px solid rgba(76, 175, 80, 0.2);
+  background-color: var(--mat-sys-tertiary-container) !important;
+  color: var(--mat-sys-on-tertiary-container) !important;
+  border: 1px solid var(--mat-sys-outline-variant);
   transition: all 0.2s ease;
 }
 
 .org-chip:hover {
-  background-color: rgba(76, 175, 80, 0.2) !important;
+  background-color: var(--mat-sys-tertiary) !important;
+  color: var(--mat-sys-on-tertiary) !important;
 }
 
 .text-gray-400 {
-  color: #9ca3af;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .text-sm {

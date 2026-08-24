@@ -1,6 +1,8 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, ViewChild, AfterViewInit } from '@angular/core';
 
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
@@ -16,6 +18,8 @@ import { AuthService } from '../../core/services/auth';
   standalone: true,
   imports: [
     MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
@@ -25,14 +29,17 @@ import { AuthService } from '../../core/services/auth';
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.css',
 })
-export class InventoryComponent implements OnInit {
+export class InventoryComponent implements OnInit, AfterViewInit {
   private inventoryService = inject(InventoryService);
   private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
   public authService = inject(AuthService);
 
-  inventories: Inventory[] = [];
+  dataSource = new MatTableDataSource<Inventory>([]);
   displayedColumns: string[] = ['name', 'organization', 'actions'];
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
     if (this.authService.currentUser()?.role !== 'admin') {
@@ -41,9 +48,14 @@ export class InventoryComponent implements OnInit {
     this.loadInventories();
   }
 
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
   loadInventories() {
     this.inventoryService.getInventories().subscribe((data) => {
-      this.inventories = data;
+      this.dataSource.data = data;
       this.cdr.markForCheck();
     });
   }

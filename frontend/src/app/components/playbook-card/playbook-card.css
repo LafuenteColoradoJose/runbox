@@ -23,3 +23,7 @@ mat-card-content {
   font-weight: 600;
   letter-spacing: 0.5px;
 }
+
+mat-card-subtitle {
+  word-break: break-all;
+}

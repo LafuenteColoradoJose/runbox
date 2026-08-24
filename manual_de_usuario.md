@@ -8,7 +8,7 @@ Runbox está diseñado para simplificar las ejecuciones de los *Playbooks* de An
 > **Credenciales de Acceso (Pruebas Locales):**
 > Para acceder al portal, utiliza el usuario `administrator` y la contraseña `Usuario1.`
 
-Destaca por ofrecer una experiencia visual **Premium y Moderna** (basada en *Glassmorphism*, transiciones suaves y un entorno responsivo), garantizando además la máxima seguridad (por ejemplo, impidiendo volver atrás al Login una vez iniciada la sesión).
+Destaca por ofrecer una experiencia visual **Premium y Moderna** (basada en el diseño de **Material Design 3**, modo claro/oscuro dinámico y componentes altamente responsivos), garantizando además la máxima seguridad (por ejemplo, impidiendo volver atrás al Login una vez iniciada la sesión).
 
 ---
 
