@@ -153,40 +153,81 @@ db.init = function() {
     insertStmt.run('Dummy Playbook (Test)', testPlaybookPath);
   }
 
-  // Sembrar datos de prueba (Dummy Data) para el Inventario
-  const orgCountStmt = db.prepare('SELECT count(*) as count FROM organizations');
-  const { count: orgCount } = orgCountStmt.get();
-  if (orgCount === 0) {
-    console.log('--- SEEDING DUMMY INVENTORY DATA NOW ---');
-    console.log('Seeding dummy inventory data...');
+  // Sembrar datos de prueba más completos (TechNova Global)
+  const checkDemoOrg = db.prepare('SELECT id FROM organizations WHERE name = ?');
+  const demoOrg = checkDemoOrg.get('TechNova Global (Demo)');
+  
+  if (!demoOrg) {
+    console.log('--- SEEDING EXTENDED DUMMY DATA (TechNova Global) ---');
+    const bcrypt = require('bcryptjs');
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync('DemoUser123.', salt);
+    
     // Organización
     const insertOrg = db.prepare('INSERT INTO organizations (name) VALUES (?)');
-    const orgResult = insertOrg.run('Organización de Pruebas (Dummy)');
+    const orgResult = insertOrg.run('TechNova Global (Demo)');
     const orgId = orgResult.lastInsertRowid;
+
+    // Usuarios
+    const insertUser = db.prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+    const insertUserOrg = db.prepare('INSERT INTO user_organizations (user_id, organization_id) VALUES (?, ?)');
+    
+    const u1 = insertUser.run('ana.ventas', hash, 'user');
+    const u2 = insertUser.run('carlos.admin', hash, 'admin');
+    const u3 = insertUser.run('lucia.devops', hash, 'admin');
+    const u4 = insertUser.run('david.rrhh', hash, 'user');
+    
+    insertUserOrg.run(u1.lastInsertRowid, orgId);
+    insertUserOrg.run(u2.lastInsertRowid, orgId);
+    insertUserOrg.run(u3.lastInsertRowid, orgId);
+    insertUserOrg.run(u4.lastInsertRowid, orgId);
+    
+    // Añadimos el admin principal a esta org también
+    const mainAdmin = db.prepare("SELECT id FROM users WHERE username = 'administrator'").get();
+    if (mainAdmin) {
+      try { insertUserOrg.run(mainAdmin.id, orgId); } catch(e) {}
+    }
 
     // Inventario
     const insertInv = db.prepare('INSERT INTO inventories (organization_id, name) VALUES (?, ?)');
-    const invResult = insertInv.run(orgId, 'Inventario Principal (Dummy)');
+    const invResult = insertInv.run(orgId, 'Datacenter Principal');
     const invId = invResult.lastInsertRowid;
 
     // Grupos
     const insertGroup = db.prepare('INSERT INTO groups (inventory_id, name, variables) VALUES (?, ?, ?)');
-    const webGroupResult = insertGroup.run(invId, 'web_servers_dummy', JSON.stringify({ http_port: 80, env: 'test' }));
-    const dbGroupResult = insertGroup.run(invId, 'db_servers_dummy', JSON.stringify({ db_port: 5432 }));
-    const webGroupId = webGroupResult.lastInsertRowid;
-    const dbGroupId = dbGroupResult.lastInsertRowid;
-
+    const grpVentas = insertGroup.run(invId, 'ventas_servers', JSON.stringify({ env: 'produccion', priority: 'high' }));
+    const grpAdmin = insertGroup.run(invId, 'admin_erp', JSON.stringify({ env: 'produccion', backup: 'daily' }));
+    const grpIT = insertGroup.run(invId, 'it_produccion', JSON.stringify({ env: 'produccion', os: 'ubuntu-22.04' }));
+    const grpDev = insertGroup.run(invId, 'desarrollo', JSON.stringify({ env: 'dev', os: 'centos-stream' }));
+    
     // Hosts
     const insertHost = db.prepare('INSERT INTO hosts (inventory_id, name, ip_address, variables) VALUES (?, ?, ?, ?)');
-    const host1 = insertHost.run(invId, 'web-01-dummy.local', '192.168.1.101', JSON.stringify({ ansible_user: 'admin' }));
-    const host2 = insertHost.run(invId, 'web-02-dummy.local', '192.168.1.102', JSON.stringify({ ansible_user: 'admin' }));
-    const host3 = insertHost.run(invId, 'db-01-dummy.local', '192.168.1.201', JSON.stringify({ max_connections: 500 }));
+    
+    // Hosts Ventas
+    const hV1 = insertHost.run(invId, 'crm-app-01', '10.0.1.10', JSON.stringify({ ram: '8GB', cpu: 4 }));
+    const hV2 = insertHost.run(invId, 'crm-app-02', '10.0.1.11', JSON.stringify({ ram: '8GB', cpu: 4 }));
+    const hV3 = insertHost.run(invId, 'crm-db-primary', '10.0.1.20', JSON.stringify({ db_engine: 'postgres', port: 5432 }));
+    
+    // Hosts Admin
+    const hA1 = insertHost.run(invId, 'erp-server-01', '10.0.2.10', JSON.stringify({ application: 'odoo' }));
+    const hA2 = insertHost.run(invId, 'finanzas-db', '10.0.2.20', JSON.stringify({ db_engine: 'oracle' }));
+    
+    // Hosts IT
+    const hI1 = insertHost.run(invId, 'bastion-01', '10.0.99.5', JSON.stringify({ role: 'bastion', ssh_port: 2222 }));
+    const hI2 = insertHost.run(invId, 'monitor-sys', '10.0.99.10', JSON.stringify({ software: 'prometheus' }));
+    
+    // Hosts Dev
+    const hD1 = insertHost.run(invId, 'dev-sandbox-01', '10.1.1.10', JSON.stringify({ owner: 'lucia.devops' }));
+    const hD2 = insertHost.run(invId, 'dev-sandbox-02', '10.1.1.11', JSON.stringify({ owner: 'lucia.devops' }));
+    const hD3 = insertHost.run(invId, 'qa-db-test', '10.1.1.20', JSON.stringify({ ephemeral: true }));
 
     // Relaciones Host-Grupo
     const insertHostGroup = db.prepare('INSERT INTO host_groups (host_id, group_id) VALUES (?, ?)');
-    insertHostGroup.run(host1.lastInsertRowid, webGroupId);
-    insertHostGroup.run(host2.lastInsertRowid, webGroupId);
-    insertHostGroup.run(host3.lastInsertRowid, dbGroupId);
+    
+    [hV1, hV2, hV3].forEach(h => insertHostGroup.run(h.lastInsertRowid, grpVentas.lastInsertRowid));
+    [hA1, hA2].forEach(h => insertHostGroup.run(h.lastInsertRowid, grpAdmin.lastInsertRowid));
+    [hI1, hI2].forEach(h => insertHostGroup.run(h.lastInsertRowid, grpIT.lastInsertRowid));
+    [hD1, hD2, hD3].forEach(h => insertHostGroup.run(h.lastInsertRowid, grpDev.lastInsertRowid));
   }
 };
 
