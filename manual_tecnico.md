@@ -129,6 +129,9 @@ Dado el paradigma actual donde la programación asistida por agentes autónomos 
 En concreto, se han empleado las siguientes herramientas agénticas:
 *   **Skill de Angular** ([https://github.com/angular/skills](https://github.com/angular/skills)): Para asegurar que el código generado sigue las convenciones más modernas del framework (Angular 18+), componentes standalone, signal-based reactivity (Signals) y las mejores prácticas de inyección de dependencias.
 *   **Agent Skills de Addy Osmani** ([https://github.com/addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)): Una potente suite de habilidades que proporciona al agente de IA flujos de trabajo estructurados. Se ha utilizado para diseñar interfaces estables (API), revisión cruzada de código (*code review*), y desarrollo guiado por pruebas (*TDD*), garantizando así un código robusto, escalable y con una alta cobertura de tests.
+
+El ciclo de desarrollo seguido fue:
+
   DEFINE          PLAN           BUILD          VERIFY         REVIEW          SHIP
  ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐
  │ Idea │ ───▶ │ Spec │ ───▶ │ Code │ ───▶ │ Test │ ───▶ │  QA  │ ───▶ │  Go  │
