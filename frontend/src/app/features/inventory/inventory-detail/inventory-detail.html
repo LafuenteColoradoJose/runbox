@@ -19,6 +19,19 @@
 
   <div class="inv-detail-content">
     <mat-tab-group class="tab-group" mat-stretch-tabs="false">
+      <!-- TOPOLOGY TAB (TREE LAYOUT) -->
+      <mat-tab label="Topology">
+        <div class="topology-wrapper">
+          @if (hostsDataSource.data.length > 0) {
+            <div echarts [options]="chartOption" class="topology-chart"></div>
+          } @else {
+            <div class="topology-empty">
+              No hosts to display topology.
+            </div>
+          }
+        </div>
+      </mat-tab>
+
       <!-- HOSTS TAB -->
       <mat-tab label="Hosts">
         <div class="tab-content">
@@ -123,19 +136,6 @@
           }
           
           <mat-paginator #groupPaginator [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons></mat-paginator>
-        </div>
-      </mat-tab>
-
-      <!-- TOPOLOGY TAB (TREE LAYOUT) -->
-      <mat-tab label="Topology">
-        <div class="topology-wrapper">
-          @if (hostsDataSource.data.length > 0) {
-            <div echarts [options]="chartOption" class="topology-chart"></div>
-          } @else {
-            <div class="topology-empty">
-              No hosts to display topology.
-            </div>
-          }
         </div>
       </mat-tab>
 
