@@ -19,10 +19,27 @@
   gap: 16px;
 }
 
-.playbooks-grid {
+.tag-filter {
+  width: 150px;
+}
+
+.view-toggle {
+  display: flex;
+  background-color: var(--mat-sys-surface-container-low);
+  border-radius: 24px;
+  padding: 4px;
+}
+
+.playbooks-container.grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
+}
+
+.playbooks-container.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 .loading-state, .empty-state {
   display: flex;

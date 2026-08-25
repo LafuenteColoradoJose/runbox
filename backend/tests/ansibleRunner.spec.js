@@ -22,9 +22,16 @@ describe('ansibleRunner', () => {
     
     vi.spyOn(cp, 'spawn').mockReturnValue(childMock);
 
-    // Create a dummy job to update
-    const insertJob = db.prepare(`INSERT INTO jobs (playbook_id, status) VALUES (1, 'running')`);
-    const result = insertJob.run();
+    const fs = require('fs');
+    vi.spyOn(fs.promises, 'writeFile').mockResolvedValue();
+    vi.spyOn(fs, 'unlink').mockImplementation((path, cb) => cb && cb(null));
+
+    // Create a dummy playbook and job to update
+    const playbookResult = db.prepare(`INSERT INTO playbooks (name, path) VALUES ('Test PB for Job', '/fake/path')`).run();
+    const testPlaybookId = playbookResult.lastInsertRowid;
+
+    const insertJob = db.prepare(`INSERT INTO jobs (playbook_id, status) VALUES (?, 'running')`);
+    const result = insertJob.run(testPlaybookId);
     jobId = result.lastInsertRowid;
   });
 
@@ -169,5 +176,92 @@ describe('ansibleRunner', () => {
     expect(args[0]).toContain('site.yml');
     const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId);
     expect(job.status).toBe('success');
+  });
+  it('should handle fs.promises.writeFile error for local playbook', async () => {
+    const fs = require('fs');
+    vi.spyOn(fs.promises, 'writeFile').mockRejectedValue(new Error('Write failed'));
+    
+    const promise = runPlaybook({ path: '/fake/path.yml', content: 'test' }, ioMock, jobId);
+    
+    setTimeout(() => {
+      // Simulate close since ansible will still be spawned and fail
+      childMock.emit('close', 1);
+    }, 10);
+    
+    await expect(promise).rejects.toThrow('Exit code 1');
+    
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId);
+    expect(job.status).toBe('failed');
+    
+    vi.restoreAllMocks();
+  });
+
+  it('should handle git clone error', async () => {
+    const fs = require('fs');
+    vi.spyOn(fs, 'existsSync').mockReturnValue(false); 
+    vi.spyOn(fs, 'mkdirSync').mockImplementation(() => {});
+    vi.spyOn(cp, 'execSync').mockImplementation(() => {
+      throw new Error('Git clone failed');
+    });
+
+    const playbook = {
+      source_type: 'git',
+      git_repo_url: 'https://test.git',
+      git_branch: 'main',
+      git_path: 'site.yml'
+    };
+
+    const promise = runPlaybook(playbook, ioMock, jobId);
+    await expect(promise).rejects.toThrow('Git clone failed');
+
+    expect(ioMock.emit).toHaveBeenCalledWith(`job-${jobId}-log`, { type: 'error', data: expect.stringContaining('Git clone failed') });
+    
+    vi.restoreAllMocks();
+  });
+
+  it('should handle database source type', async () => {
+    const fs = require('fs');
+    const playbook = {
+      source_type: 'database',
+      content: '---'
+    };
+    
+    const promise = runPlaybook(playbook, ioMock, jobId);
+    
+    setTimeout(() => {
+      childMock.emit('close', 0);
+    }, 10);
+    
+    await promise;
+    expect(fs.promises.writeFile).toHaveBeenCalled();
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId);
+    expect(job.status).toBe('success');
+  });
+
+  it('should handle git source type when repo exists', async () => {
+    const fs = require('fs');
+    vi.spyOn(fs, 'existsSync').mockReturnValue(true); 
+    vi.spyOn(cp, 'execSync').mockImplementation(() => {});
+
+    const playbook = {
+      source_type: 'git',
+      git_repo_url: 'https://test.git',
+      git_branch: 'main',
+      git_path: 'site.yml'
+    };
+
+    const promise = runPlaybook(playbook, ioMock, jobId);
+    
+    setTimeout(() => {
+      childMock.emit('close', 0);
+    }, 10);
+    
+    await promise;
+
+    expect(cp.execSync).toHaveBeenCalledWith(expect.stringContaining('git fetch'));
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId);
+    expect(job.status).toBe('success');
+    
+    vi.restoreAllMocks();
   });
 });

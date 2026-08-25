@@ -160,16 +160,26 @@ app.get('/api/playbooks', authMiddleware, (req, res) => {
       )
     `).all(req.user.id);
   }
+  
+  playbooks.forEach(p => {
+    try {
+      p.tags = JSON.parse(p.tags || '[]');
+    } catch(e) {
+      p.tags = [];
+    }
+  });
+  
   res.json(playbooks);
 });
 
 app.post('/api/playbooks', authMiddleware, requireAdmin, (req, res) => {
   try {
-    const { name, path, content, source_type, git_repo_url, git_branch, git_path, organization_id } = req.body;
-    const stmt = db.prepare('INSERT INTO playbooks (name, path, content, source_type, git_repo_url, git_branch, git_path, organization_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+    const { name, path, content, source_type, git_repo_url, git_branch, git_path, tags, organization_id } = req.body;
+    const stmt = db.prepare('INSERT INTO playbooks (name, path, content, source_type, git_repo_url, git_branch, git_path, tags, organization_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
     const stType = source_type || 'local_path';
-    const result = stmt.run(name, path || null, content || null, stType, git_repo_url || null, git_branch || null, git_path || null, organization_id || null);
-    res.json({ id: result.lastInsertRowid, name, path, content, source_type: stType, git_repo_url, git_branch, git_path, organization_id: organization_id || null });
+    const tagsStr = tags ? JSON.stringify(tags) : '[]';
+    const result = stmt.run(name, path || null, content || null, stType, git_repo_url || null, git_branch || null, git_path || null, tagsStr, organization_id || null);
+    res.json({ id: result.lastInsertRowid, name, path, content, source_type: stType, git_repo_url, git_branch, git_path, tags: tags || [], organization_id: organization_id || null });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -177,10 +187,11 @@ app.post('/api/playbooks', authMiddleware, requireAdmin, (req, res) => {
 
 app.put('/api/playbooks/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
-    const { name, path, content, source_type, git_repo_url, git_branch, git_path, organization_id } = req.body;
+    const { name, path, content, source_type, git_repo_url, git_branch, git_path, tags, organization_id } = req.body;
     const stType = source_type || 'local_path';
-    db.prepare('UPDATE playbooks SET name = ?, path = ?, content = ?, source_type = ?, git_repo_url = ?, git_branch = ?, git_path = ?, organization_id = ? WHERE id = ?').run(
-      name, path || null, content || null, stType, git_repo_url || null, git_branch || null, git_path || null, organization_id || null, req.params.id
+    const tagsStr = tags ? JSON.stringify(tags) : '[]';
+    db.prepare('UPDATE playbooks SET name = ?, path = ?, content = ?, source_type = ?, git_repo_url = ?, git_branch = ?, git_path = ?, tags = ?, organization_id = ? WHERE id = ?').run(
+      name, path || null, content || null, stType, git_repo_url || null, git_branch || null, git_path || null, tagsStr, organization_id || null, req.params.id
     );
     res.json({ success: true });
   } catch (err) {

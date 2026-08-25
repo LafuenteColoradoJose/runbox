@@ -13,6 +13,7 @@ export interface Playbook {
   git_branch?: string;
   git_path?: string;
   description: string;
+  tags?: string[];
   organization_id?: number;
   organization_name?: string;
   created_at: string;

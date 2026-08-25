@@ -19,11 +19,73 @@ mat-card-content {
 }
 
 .run-btn {
-  border-radius: 12px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  background-color: var(--mat-sys-primary) !important;
+  color: var(--mat-sys-on-primary) !important;
+  margin-left: 8px;
 }
 
+
+
 mat-card-subtitle {
-  word-break: break-all;
+  word-break: break-word;
+}
+
+.source-container {
+  margin-top: 6px;
+}
+
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface-variant);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.source-badge mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+/* List mode specific styles */
+.playbook-card.list-mode {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+}
+
+.playbook-card.list-mode mat-card-header {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.playbook-card.list-mode mat-card-actions {
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.playbook-tags {
+  margin-top: 8px;
+}
+
+.playbook-card.list-mode .playbook-tags {
+  margin-top: 0;
+  margin-left: 16px;
+  flex: 1;
+}
+
+.tag-chip {
+  min-height: 24px;
+  font-size: 0.75rem;
+  background-color: rgba(76, 175, 80, 0.1) !important;
+  color: #2e7d32 !important;
+  border: 1px solid rgba(76, 175, 80, 0.3) !important;
+  font-weight: 500;
 }

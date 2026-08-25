@@ -1,17 +1,33 @@
-<mat-card class="playbook-card" appearance="outlined">
+<mat-card class="playbook-card" [class.list-mode]="viewMode() === 'list'" appearance="outlined">
   <mat-card-header>
     <mat-icon mat-card-avatar class="playbook-icon">integration_instructions</mat-icon>
     <mat-card-title>{{ playbook().name }}</mat-card-title>
-    <mat-card-subtitle>
+    <mat-card-subtitle class="source-container">
       @if (playbook().source_type === 'database') {
-        Código (Base de Datos)
+        <div class="source-badge" matTooltip="Guardado en Base de Datos">
+          <mat-icon inline>storage</mat-icon> Base de Datos
+        </div>
       } @else if (playbook().source_type === 'git') {
-        Git: {{ playbook().git_repo_url }}
+        <div class="source-badge" [matTooltip]="playbook().git_repo_url || ''">
+          <mat-icon inline>account_tree</mat-icon> Repositorio Git
+        </div>
       } @else {
-        {{ playbook().path }}
+        <div class="source-badge" [matTooltip]="playbook().path || ''">
+          <mat-icon inline>folder</mat-icon> Ruta Local
+        </div>
       }
     </mat-card-subtitle>
   </mat-card-header>
+
+  @if (playbook().tags && playbook().tags!.length > 0) {
+    <mat-card-content>
+      <mat-chip-set class="playbook-tags">
+        @for (tag of playbook().tags; track tag) {
+          <mat-chip class="tag-chip">{{ tag }}</mat-chip>
+        }
+      </mat-chip-set>
+    </mat-card-content>
+  }
 
   <mat-card-actions align="end">
     @if (isAdmin()) {
@@ -22,8 +38,8 @@
         <mat-icon>delete</mat-icon>
       </button>
     }
-    <button mat-flat-button color="primary" (click)="onRun.emit(playbook())" class="run-btn">
-      <mat-icon>play_arrow</mat-icon> Lanza Playbook
+    <button mat-icon-button (click)="onRun.emit(playbook())" class="run-btn" matTooltip="Lanzar">
+      <mat-icon>play_arrow</mat-icon>
     </button>
   </mat-card-actions>
 </mat-card>

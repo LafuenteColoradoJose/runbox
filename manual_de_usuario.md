@@ -59,19 +59,20 @@ Al entrar a Runbox, verás un menú lateral con las principales opciones. Por de
 
 ### 2. Ejecución de un Playbook
 1. Ve a la sección **Playbooks** en el menú lateral.
-2. Verás tarjetas (Cards) listando todas las automatizaciones disponibles (ej. *Dummy Playbook (Test)*, *Actualizar Servidores Web*).
-3. Haz clic en el botón de "Play" (Run) de color azul en la tarjeta deseada.
+2. Verás tarjetas (Cards) listando todas las automatizaciones disponibles (ej. *Dummy Playbook (Test)*, *Actualizar Servidores Web*). Las tarjetas mostrarán unas elegantes etiquetas de colores (tags) que identifican su categoría.
+3. Haz clic en el botón redondo de "Play" (Run) de color azul en la esquina inferior de la tarjeta deseada.
 4. El sistema creará un **Trabajo (Job)** y te redirigirá automáticamente a la pantalla de la consola.
 
 ### 3. Creación de Playbooks desde Git (GitOps)
 Además de los playbooks locales, los administradores pueden añadir playbooks alojados en repositorios Git externos.
 1. En la vista de **Playbooks**, pulsa sobre **New Playbook**.
-2. Rellena los datos básicos (Nombre, Inventario) y en el apartado de contenido, selecciona el tipo **Git Repository**.
-3. Deberás introducir:
+2. Rellena los datos básicos (Nombre, Inventario) y opcionalmente añade **Tags (Categorías)** para ayudar a los usuarios a localizarlos fácilmente (ej. *Base de Datos*, *Redes*).
+3. En el apartado de contenido, selecciona el tipo **Git Repository**.
+4. Deberás introducir:
    * **URL del repositorio:** (Ej. `https://github.com/usuario/repo.git`)
    * **Rama (Branch):** (Ej. `main` o `master`)
    * **Archivo Playbook:** La ruta dentro del repositorio del archivo YAML (Ej. `playbooks/deploy.yaml`).
-4. Al ejecutarse, Runbox clonará este código, lanzará la automatización y luego eliminará los archivos residuales.
+5. Al ejecutarse, Runbox clonará este código, lanzará la automatización y luego eliminará los archivos residuales.
 
 ### 4. Visualización en Tiempo Real (Consola)
 Una vez en la vista de *Job Detail*, observarás una terminal negra clásica.
@@ -82,7 +83,7 @@ Una vez en la vista de *Job Detail*, observarás una terminal negra clásica.
 ### 5. Consultar Ejecuciones Pasadas
 Si te vas de la pantalla o cierras la pestaña por error, no te preocupes. Todo el progreso queda guardado en la base de datos de manera persistente. Si vuelves a ingresar a la URL del trabajo, el log histórico se cargará inmediatamente desde donde se quedó.
 
-### 6. Búsqueda y Filtrado en Tiempo Real
-Todas las vistas principales (Playbooks, Organizaciones, Inventarios y Usuarios) cuentan con una **barra de búsqueda global unificada**.
-- La búsqueda es instantánea (en tiempo real) y reactiva.
-- Te permite localizar rápidamente recursos escribiendo cualquier parte del nombre, ID u otras propiedades visibles en la tabla.
+### 6. Búsqueda y Filtrado en Tiempo Real (Categorías)
+Todas las vistas principales (Playbooks, Organizaciones, Inventarios y Usuarios) cuentan con potentes filtros en la cabecera:
+- **Barra de búsqueda global:** La búsqueda es instantánea (en tiempo real) y reactiva, localizando rápidamente recursos escribiendo cualquier parte del nombre, ID u otras propiedades.
+- **Filtro por Categoría (Tags):** En la vista de Playbooks, dispones de un menú desplegable (dropdown) que lista automáticamente todas las categorías existentes creadas por el administrador. Al seleccionar una, la interfaz mostrará al instante solo los playbooks relevantes, sin necesidad de que memorices ninguna categoría.

@@ -26,7 +26,7 @@ El modelo de datos relacional refleja una jerarquía estándar para plataformas 
 2. **Inventories (`inventories`)**: Agrupaciones de infraestructura pertenecientes a una organización (Ej. *AWS Production*).
 3. **Groups (`groups`)**: Agrupaciones lógicas de hosts (Ej. *web_servers*). Pueden almacenar variables compartidas en formato JSON.
 4. **Hosts (`hosts`)**: Máquinas finales gestionadas por Ansible, asociadas a uno o más grupos (`host_groups`). También soportan variables JSON individuales.
-5. **Users & Playbooks (`users`, `user_organizations`, `playbooks`)**: Los usuarios tienen un `role` (admin/user). Los usuarios normales están vinculados a organizaciones mediante la tabla puente `user_organizations`. Los Playbooks también pueden pertenecer a un `organization_id`. Esta estructura soporta el filtrado restrictivo del sistema.
+5. **Users & Playbooks (`users`, `user_organizations`, `playbooks`)**: Los usuarios tienen un `role` (admin/user). Los usuarios normales están vinculados a organizaciones mediante la tabla puente `user_organizations`. Los Playbooks también pueden pertenecer a un `organization_id`. Esta estructura soporta el filtrado restrictivo del sistema. Adicionalmente, los Playbooks soportan un campo `tags` estructurado como JSON Array (`TEXT` parseado como JSON) para la categorización y filtrado dinámico en la UI.
 
 ### Mecanismo de Seguridad (RBAC)
 Tanto la API como el Frontend (UI) se coordinan para el control de acceso:
@@ -39,9 +39,10 @@ Tanto la API como el Frontend (UI) se coordinan para el control de acceso:
 
 El frontend está estructurado siguiendo las mejores prácticas de Angular moderno (sin `NgModules`). 
 *   **App Shell**: Utiliza Angular Material para proporcionar un `Sidenav` y un `Toolbar` persistentes.
-*   **Reactividad Basada en Signals (Todo a Signals)**: La arquitectura prescinde completamente del antiguo patrón `MatTableDataSource` y flujos de RxJS complejos para las tablas. Todo el estado (datos originales, filtros de búsqueda, paginación y ordenamiento) se gestiona de manera declarativa y altamente eficiente utilizando **Angular Signals** (`signal`, `computed`, `model()`).
+*   **Reactividad Basada en Signals (Todo a Signals)**: La arquitectura prescinde completamente del antiguo patrón `MatTableDataSource` y flujos de RxJS complejos para las tablas. Todo el estado (datos originales, filtros de búsqueda por texto, filtros de categorías y paginación) se gestiona de manera declarativa y altamente eficiente utilizando **Angular Signals** (`signal`, `computed`, `model()`). El filtrado combinado de Playbooks (texto + categoría) se evalúa instantáneamente con un `computed` derivado.
 *   **Componentes Compartidos**:
     *   **SearchBarComponent (`<app-search-bar>`)**: Un componente reutilizable inyectado en todas las vistas principales que sincroniza de forma bidireccional el término de búsqueda, disparando la actualización en tiempo real del motor de filtrado basado en Signals.
+    *   **PlaybookCardComponent (`<app-playbook-card>`)**: Componente presentacional encargado del renderizado moderno de los playbooks, implementando la directiva de Angular Material e iterando un sistema estético de _tags_ extraídas del JSON del backend.
 *   **Enrutamiento**: Declarativo en `app.routes.ts`.
     *   `/dashboard`: Vista principal con gráficas (ECharts) de métricas del sistema, hosts y trabajos recientes.
     *   `/playbooks`, `/organizations`, `/inventory`, `/users`: Vistas de datos unificadas, todas con soporte nativo de búsqueda en tiempo real, paginación y ordenamiento impulsado por Signals.

@@ -12,6 +12,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../core/services/auth';
 import { PlaybookDialog } from '../../components/playbook-dialog/playbook-dialog';
 import { PlaybookRunDialog } from '../../components/playbook-run-dialog/playbook-run-dialog';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { SearchBarComponent } from '../../components/search-bar/search-bar';
 
 @Component({
@@ -24,6 +26,8 @@ import { SearchBarComponent } from '../../components/search-bar/search-bar';
     MatIconModule,
     MatButtonModule,
     MatPaginatorModule,
+    MatSelectModule,
+    MatFormFieldModule,
     PlaybookCard,
     SearchBarComponent
   ],
@@ -42,19 +46,38 @@ export class Playbooks implements OnInit {
   isAdmin = computed(() => this.auth.currentUser()?.role === 'admin');
 
   searchQuery = signal<string>('');
+  selectedTag = signal<string>('');
+  viewMode = signal<'grid' | 'list'>('grid');
 
   pageSize = signal(10);
   pageIndex = signal(0);
 
+  availableTags = computed(() => {
+    const tags = new Set<string>();
+    this.playbooks().forEach(p => {
+      if (p.tags) p.tags.forEach(t => tags.add(t));
+    });
+    return Array.from(tags).sort();
+  });
+
   filteredPlaybooks = computed(() => {
-    const query = this.searchQuery().toLowerCase().trim();
-    if (!query) {
-      return this.playbooks();
+    let result = this.playbooks();
+    
+    const tag = this.selectedTag();
+    if (tag) {
+      result = result.filter(p => p.tags && p.tags.includes(tag));
     }
-    return this.playbooks().filter(p => 
-      p.name.toLowerCase().includes(query) || 
-      (p.description && p.description.toLowerCase().includes(query))
-    );
+
+    const query = this.searchQuery().toLowerCase().trim();
+    if (query) {
+      result = result.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        (p.description && p.description.toLowerCase().includes(query)) ||
+        (p.tags && p.tags.some(t => t.toLowerCase().includes(query)))
+      );
+    }
+    
+    return result;
   });
 
   pagedPlaybooks = computed(() => {

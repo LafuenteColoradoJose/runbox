@@ -57,6 +57,23 @@
 
 
     <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Etiquetas / Tags (separadas por coma)</mat-label>
+      <input matInput formControlName="tagsRaw" placeholder="Ej: Sistema, Base de Datos, Producción">
+      <mat-icon matSuffix>sell</mat-icon>
+    </mat-form-field>
+    
+    <div class="tags-suggestions">
+      <span class="suggestions-label">Sugerencias:</span>
+      <mat-chip-set>
+        @for (tag of suggestedTags; track tag) {
+          <mat-chip (click)="addSuggestedTag(tag)" style="cursor: pointer;">
+            {{ tag }}
+          </mat-chip>
+        }
+      </mat-chip-set>
+    </div>
+
+    <mat-form-field appearance="fill" class="full-width" style="margin-top: 16px;">
       <mat-label>Organización (Opcional - Dejar vacío para Global)</mat-label>
       <mat-select formControlName="organization_id">
         <mat-option [value]="null">--- Playbook Global ---</mat-option>

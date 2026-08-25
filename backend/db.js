@@ -26,6 +26,7 @@ db.init = function() {
       git_repo_url TEXT,
       git_branch TEXT,
       git_path TEXT,
+      tags TEXT DEFAULT '[]',
       organization_id INTEGER,
       FOREIGN KEY(organization_id) REFERENCES organizations(id) ON DELETE SET NULL
     );
@@ -109,6 +110,9 @@ db.init = function() {
     db.exec("ALTER TABLE playbooks ADD COLUMN git_branch TEXT");
     db.exec("ALTER TABLE playbooks ADD COLUMN git_path TEXT");
   }
+  if (!playbooksCols.find(c => c.name === 'tags')) {
+    db.exec("ALTER TABLE playbooks ADD COLUMN tags TEXT DEFAULT '[]'");
+  }
 
   const jobsCols = db.prepare("PRAGMA table_info(jobs)").all();
   if (!jobsCols.find(c => c.name === 'user_id')) {
@@ -149,8 +153,8 @@ db.init = function() {
         msg: "Task finished successfully."
 `);
     }
-    const insertStmt = db.prepare('INSERT INTO playbooks (name, path) VALUES (?, ?)');
-    insertStmt.run('Dummy Playbook (Test)', testPlaybookPath);
+    const insertStmt = db.prepare('INSERT INTO playbooks (name, path, tags) VALUES (?, ?, ?)');
+    insertStmt.run('Dummy Playbook (Test)', testPlaybookPath, JSON.stringify(['Sistema', 'Test']));
   }
 
   // Sembrar datos de prueba más completos (TechNova Global)

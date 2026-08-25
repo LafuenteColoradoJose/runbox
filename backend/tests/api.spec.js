@@ -79,12 +79,14 @@ describe('API Endpoints', () => {
       const res = await request(app)
         .post('/api/playbooks')
         .set('Authorization', `Bearer ${token}`)
-        .send({ name: 'Test Playbook API', path: '/test/path.yml' });
+        .send({ name: 'Test Playbook API', path: '/test/path.yml', tags: ['Test', 'API'] });
       if (res.status !== 200) console.error('Create Playbook Error:', res.body);
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('name', 'Test Playbook API');
       expect(res.body).toHaveProperty('path', '/test/path.yml');
+      expect(res.body).toHaveProperty('tags');
+      expect(res.body.tags).toEqual(['Test', 'API']);
       playbookId = res.body.id;
     });
 
@@ -92,7 +94,7 @@ describe('API Endpoints', () => {
       const res = await request(app)
         .put(`/api/playbooks/${playbookId}`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ name: 'Updated Playbook', path: '/test/updated.yml', organization_id: null });
+        .send({ name: 'Updated Playbook', path: '/test/updated.yml', organization_id: null, tags: ['Updated'] });
       if (res.status !== 200) console.error('Update Playbook Error:', res.body);
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('success', true);
