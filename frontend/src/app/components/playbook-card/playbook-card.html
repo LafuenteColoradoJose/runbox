@@ -4,16 +4,16 @@
     <mat-card-title>{{ playbook().name }}</mat-card-title>
     <mat-card-subtitle class="source-container">
       @if (playbook().source_type === 'database') {
-        <div class="source-badge" matTooltip="Guardado en Base de Datos">
-          <mat-icon inline>storage</mat-icon> Base de Datos
+        <div class="source-badge" matTooltip="Saved in Database">
+          <mat-icon inline>storage</mat-icon> Database
         </div>
       } @else if (playbook().source_type === 'git') {
         <div class="source-badge" [matTooltip]="playbook().git_repo_url || ''">
-          <mat-icon inline>account_tree</mat-icon> Repositorio Git
+          <mat-icon inline>account_tree</mat-icon> Git Repository
         </div>
       } @else {
         <div class="source-badge" [matTooltip]="playbook().path || ''">
-          <mat-icon inline>folder</mat-icon> Ruta Local
+          <mat-icon inline>folder</mat-icon> Local Path
         </div>
       }
     </mat-card-subtitle>
@@ -31,14 +31,14 @@
 
   <mat-card-actions align="end">
     @if (isAdmin()) {
-      <button mat-icon-button color="primary" (click)="onEdit.emit(playbook())" matTooltip="Editar">
+      <button mat-icon-button color="primary" (click)="onEdit.emit(playbook())" matTooltip="Edit">
         <mat-icon>edit</mat-icon>
       </button>
-      <button mat-icon-button color="warn" (click)="onDelete.emit(playbook())" matTooltip="Eliminar">
+      <button mat-icon-button color="warn" (click)="onDelete.emit(playbook())" matTooltip="Delete">
         <mat-icon>delete</mat-icon>
       </button>
     }
-    <button mat-icon-button (click)="onRun.emit(playbook())" class="run-btn" matTooltip="Lanzar">
+    <button mat-icon-button (click)="onRun.emit(playbook())" class="run-btn" matTooltip="Run">
       <mat-icon>play_arrow</mat-icon>
     </button>
   </mat-card-actions>

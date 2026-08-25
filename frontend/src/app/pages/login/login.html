@@ -5,7 +5,7 @@
         <app-logo></app-logo>
       </div>
       <mat-card-title>Runbox</mat-card-title>
-      <mat-card-subtitle>Inicia sesión para continuar</mat-card-subtitle>
+      <mat-card-subtitle>Sign in to continue</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
@@ -18,15 +18,15 @@
         }
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Usuario</mat-label>
+          <mat-label>Username</mat-label>
           <mat-icon matPrefix>person</mat-icon>
-          <input matInput formControlName="username" type="text" autocomplete="username" placeholder="ej: administrator">
+          <input matInput formControlName="username" type="text" autocomplete="username" placeholder="e.g. administrator">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Contraseña</mat-label>
+          <mat-label>Password</mat-label>
           <mat-icon matPrefix>lock</mat-icon>
-          <input matInput formControlName="password" type="password" autocomplete="current-password" placeholder="Tu contraseña">
+          <input matInput formControlName="password" type="password" autocomplete="current-password" placeholder="Your password">
         </mat-form-field>
 
         <div class="form-actions">
@@ -35,9 +35,9 @@
               <mat-icon class="spinner">refresh</mat-icon>
             }
             @if (loading()) {
-              Iniciando...
+              Signing in...
             } @else {
-              Entrar
+              Sign In
             }
             @if (!loading()) {
               <mat-icon iconPositionEnd>arrow_forward</mat-icon>

@@ -1,69 +1,69 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Editar Playbook' : 'Añadir Playbook' }}</h2>
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit Playbook' : 'Add Playbook' }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="playbookForm" class="dialog-form">
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Nombre</mat-label>
-      <input matInput formControlName="name" placeholder="Ej: Actualizar Servidores" required>
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Ex: Update Servers" required>
       @if (playbookForm.get('name')?.hasError('required')) {
-        <mat-error>El nombre es obligatorio</mat-error>
+        <mat-error>Name is required</mat-error>
       }
     </mat-form-field>
 
     <div class="source-type-container">
       <mat-radio-group formControlName="source_type" class="source-type-radio-group">
-        <mat-radio-button value="local_path">Ruta Local</mat-radio-button>
-        <mat-radio-button value="database">Código (Base de Datos)</mat-radio-button>
-        <mat-radio-button value="git">Repositorio Git</mat-radio-button>
+        <mat-radio-button value="local_path">Local Path</mat-radio-button>
+        <mat-radio-button value="database">Code (Database)</mat-radio-button>
+        <mat-radio-button value="git">Git Repository</mat-radio-button>
       </mat-radio-group>
     </div>
 
     @if (playbookForm.get('source_type')?.value === 'local_path') {
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Ruta (Path absoluto en servidor)</mat-label>
+        <mat-label>Path (Absolute path on server)</mat-label>
         <input matInput formControlName="path" placeholder="/etc/ansible/playbooks/site.yml">
         @if (playbookForm.get('path')?.hasError('required')) {
-          <mat-error>La ruta es obligatoria</mat-error>
+          <mat-error>Path is required</mat-error>
         }
       </mat-form-field>
     } @else if (playbookForm.get('source_type')?.value === 'git') {
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>URL del Repositorio Git</mat-label>
+        <mat-label>Git Repository URL</mat-label>
         <input matInput formControlName="git_repo_url" placeholder="https://github.com/usuario/repo.git">
         @if (playbookForm.get('git_repo_url')?.hasError('required')) {
-          <mat-error>La URL es obligatoria</mat-error>
+          <mat-error>URL is required</mat-error>
         }
       </mat-form-field>
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Rama (Opcional, por defecto main)</mat-label>
+        <mat-label>Branch (Optional, default main)</mat-label>
         <input matInput formControlName="git_branch" placeholder="main">
       </mat-form-field>
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Ruta al playbook dentro del repo</mat-label>
+        <mat-label>Path to playbook inside repo</mat-label>
         <input matInput formControlName="git_path" placeholder="playbooks/site.yml">
         @if (playbookForm.get('git_path')?.hasError('required')) {
-          <mat-error>La ruta al playbook es obligatoria</mat-error>
+          <mat-error>Path to playbook is required</mat-error>
         }
       </mat-form-field>
     } @else {
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Código del Playbook (YAML)</mat-label>
-        <textarea matInput formControlName="content" rows="10" placeholder="---\n- name: Mi playbook\n  hosts: all\n  tasks:\n    - name: Tarea\n      ping:"></textarea>
+        <mat-label>Playbook Code (YAML)</mat-label>
+        <textarea matInput formControlName="content" rows="10" placeholder="---\n- name: My playbook\n  hosts: all\n  tasks:\n    - name: Task\n      ping:"></textarea>
         @if (playbookForm.get('content')?.hasError('required')) {
-          <mat-error>El código es obligatorio</mat-error>
+          <mat-error>Code is required</mat-error>
         }
       </mat-form-field>
     }
 
 
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Etiquetas / Tags (separadas por coma)</mat-label>
-      <input matInput formControlName="tagsRaw" placeholder="Ej: Sistema, Base de Datos, Producción">
+      <mat-label>Tags (comma separated)</mat-label>
+      <input matInput formControlName="tagsRaw" placeholder="Ex: System, Database, Production">
       <mat-icon matSuffix>sell</mat-icon>
     </mat-form-field>
     
     <div class="tags-suggestions">
-      <span class="suggestions-label">Sugerencias:</span>
+      <span class="suggestions-label">Suggestions:</span>
       <mat-chip-set>
         @for (tag of suggestedTags; track tag) {
           <mat-chip (click)="addSuggestedTag(tag)" style="cursor: pointer;">
@@ -74,9 +74,9 @@
     </div>
 
     <mat-form-field appearance="fill" class="full-width" style="margin-top: 16px;">
-      <mat-label>Organización (Opcional - Dejar vacío para Global)</mat-label>
+      <mat-label>Organization (Optional - Leave empty for Global)</mat-label>
       <mat-select formControlName="organization_id">
-        <mat-option [value]="null">--- Playbook Global ---</mat-option>
+        <mat-option [value]="null">--- Global Playbook ---</mat-option>
         @for (org of organizations; track org.id) {
           <mat-option [value]="org.id">
             {{ org.name }}
@@ -88,8 +88,8 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-button mat-dialog-close>Cancel</button>
   <button mat-raised-button color="primary" [disabled]="playbookForm.invalid" (click)="onSubmit()">
-    {{ isEditMode ? 'Guardar' : 'Crear' }}
+    {{ isEditMode ? 'Save' : 'Create' }}
   </button>
 </mat-dialog-actions>

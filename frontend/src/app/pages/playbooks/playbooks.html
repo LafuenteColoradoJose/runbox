@@ -6,25 +6,25 @@
   <div class="header-actions">
     <app-search-bar [(searchQuery)]="searchQuery" placeholder="Search playbooks..."></app-search-bar>
     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="tag-filter">
-      <mat-label>Categoría</mat-label>
+      <mat-label>Category</mat-label>
       <mat-select [value]="selectedTag()" (selectionChange)="selectedTag.set($event.value)">
-        <mat-option value="">Todas</mat-option>
+        <mat-option value="">All</mat-option>
         @for (tag of availableTags(); track tag) {
           <mat-option [value]="tag">{{ tag }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
     <div class="view-toggle">
-      <button mat-icon-button (click)="viewMode.set('grid')" [color]="viewMode() === 'grid' ? 'primary' : ''" matTooltip="Vista cuadrícula">
+      <button mat-icon-button (click)="viewMode.set('grid')" [color]="viewMode() === 'grid' ? 'primary' : ''" matTooltip="Grid view">
         <mat-icon>grid_view</mat-icon>
       </button>
-      <button mat-icon-button (click)="viewMode.set('list')" [color]="viewMode() === 'list' ? 'primary' : ''" matTooltip="Vista lista">
+      <button mat-icon-button (click)="viewMode.set('list')" [color]="viewMode() === 'list' ? 'primary' : ''" matTooltip="List view">
         <mat-icon>view_list</mat-icon>
       </button>
     </div>
     @if (isAdmin()) {
       <button mat-fab extended color="primary" class="add-btn" (click)="openDialog()">
-        <mat-icon>add</mat-icon> Añadir Playbook
+        <mat-icon>add</mat-icon> Add Playbook
       </button>
     }
   </div>
