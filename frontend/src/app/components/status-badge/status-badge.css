@@ -7,6 +7,6 @@
     }
     .badge-pending { background: var(--mat-sys-surface-variant); color: var(--mat-sys-on-surface-variant); }
     .badge-running { background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container); }
-    .badge-success { background: var(--mat-sys-tertiary-container); color: var(--mat-sys-on-tertiary-container); }
+    .badge-success { background: var(--mat-sys-secondary-container); color: var(--mat-sys-on-secondary-container); }
     .badge-failed { background: var(--mat-sys-error-container); color: var(--mat-sys-on-error-container); }
     .badge-error { background: var(--mat-sys-error-container); color: var(--mat-sys-on-error-container); }

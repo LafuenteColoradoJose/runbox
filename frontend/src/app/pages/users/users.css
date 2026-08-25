@@ -72,13 +72,15 @@ table {
 }
 
 .actions-col {
-  width: 100px;
+  width: 120px;
   text-align: right;
 }
 
 .actions-cell {
   text-align: right;
   white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .empty-state {
