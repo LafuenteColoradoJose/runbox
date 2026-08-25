@@ -3,11 +3,14 @@
     <h1>Playbooks</h1>
     <p>Manage and execute your Ansible playbooks</p>
   </div>
-  @if (isAdmin()) {
-    <button mat-fab extended color="primary" class="add-btn" (click)="openDialog()">
-      <mat-icon>add</mat-icon> Añadir Playbook
-    </button>
-  }
+  <div class="header-actions">
+    <app-search-bar [(searchQuery)]="searchQuery" placeholder="Search playbooks..."></app-search-bar>
+    @if (isAdmin()) {
+      <button mat-fab extended color="primary" class="add-btn" (click)="openDialog()">
+        <mat-icon>add</mat-icon> Añadir Playbook
+      </button>
+    }
+  </div>
 </div>
 
 @if (loading()) {
@@ -32,7 +35,7 @@
   </div>
   
   <mat-paginator 
-    [length]="playbooks().length"
+    [length]="filteredPlaybooks().length"
     [pageSize]="pageSize()"
     [pageSizeOptions]="[10, 25, 50, 100]"
     (page)="onPageChange($event)"

@@ -5,6 +5,7 @@
       <p class="subtitle">Administra los usuarios y sus permisos en organizaciones</p>
     </div>
     <div class="header-actions">
+      <app-search-bar [(searchQuery)]="searchQuery"></app-search-bar>
       <button mat-fab extended color="primary" (click)="openCreateModal()">
         <mat-icon>person_add</mat-icon>
         Nuevo Usuario
@@ -13,7 +14,7 @@
   </div>
 
   <div class="mat-elevation-z2 table-container">
-    <table mat-table [dataSource]="dataSource" matSort>
+    <table mat-table [dataSource]="pagedUsers()" matSort (matSortChange)="onSortData($event)">
       <!-- ID Column -->
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
@@ -69,15 +70,21 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns();"></tr>
       
       <!-- Row shown when there is no matching data. -->
       <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="5" class="empty-state">No hay usuarios registrados</td>
+        <td class="mat-cell empty-state" [attr.colspan]="displayedColumns().length">No hay usuarios registrados</td>
       </tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Seleccionar página de usuarios"></mat-paginator>
+    <mat-paginator 
+      [length]="filteredUsers().length"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="onPageChange($event)"
+      aria-label="Seleccionar página de usuarios">
+    </mat-paginator>
   </div>
 </div>

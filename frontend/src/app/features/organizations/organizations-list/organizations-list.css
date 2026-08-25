@@ -21,6 +21,13 @@
   margin: 0;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .table-container {
   flex: 1;
   background-color: var(--surface-color);

@@ -13,6 +13,12 @@
   margin: 4px 0 0 0;
   color: var(--mat-sys-on-surface-variant);
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .playbooks-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

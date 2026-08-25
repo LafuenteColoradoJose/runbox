@@ -1,49 +1,87 @@
-import { Component, inject, OnInit, ChangeDetectorRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, signal, computed } from '@angular/core';
 
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { Sort, MatSortModule } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { InventoryService, Organization } from '../../../core/services/inventory.service';
 import { OrganizationDialog } from '../organization-dialog/organization-dialog';
 import { AuthService } from '../../../core/services/auth';
+import { SearchBarComponent } from '../../../components/search-bar/search-bar';
 
 @Component({
   selector: 'app-organizations-list',
-  imports: [MatTableModule, MatPaginatorModule, MatSortModule, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [MatTableModule, MatPaginatorModule, MatSortModule, MatButtonModule, MatIconModule, MatDialogModule, SearchBarComponent],
   templateUrl: './organizations-list.html',
   styleUrl: './organizations-list.css',
 })
-export class OrganizationsList implements OnInit, AfterViewInit {
+export class OrganizationsList implements OnInit {
   private inventoryService = inject(InventoryService);
   private dialog = inject(MatDialog);
-  private cdr = inject(ChangeDetectorRef);
   public authService = inject(AuthService);
 
-  dataSource = new MatTableDataSource<Organization>([]);
-  displayedColumns: string[] = ['id', 'name', 'actions'];
+  displayedColumns = signal<string[]>(['id', 'name', 'actions']);
+  
+  organizations = signal<Organization[]>([]);
+  searchQuery = signal<string>('');
+  
+  pageSize = signal(10);
+  pageIndex = signal(0);
+  
+  sortState = signal<Sort>({ active: '', direction: '' });
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  filteredOrganizations = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    let orgs = this.organizations();
+    
+    if (query) {
+      orgs = orgs.filter(o => 
+        o.name.toLowerCase().includes(query) || 
+        o.id.toString().includes(query)
+      );
+    }
+
+    const sort = this.sortState();
+    if (sort.active && sort.direction) {
+      orgs = [...orgs].sort((a, b) => {
+        const isAsc = sort.direction === 'asc';
+        switch (sort.active) {
+          case 'id': return compare(a.id, b.id, isAsc);
+          case 'name': return compare(a.name, b.name, isAsc);
+          default: return 0;
+        }
+      });
+    }
+
+    return orgs;
+  });
+
+  pagedOrganizations = computed(() => {
+    const startIndex = this.pageIndex() * this.pageSize();
+    return this.filteredOrganizations().slice(startIndex, startIndex + this.pageSize());
+  });
 
   ngOnInit(): void {
     if (this.authService.currentUser()?.role !== 'admin') {
-      this.displayedColumns = ['id', 'name'];
+      this.displayedColumns.set(['id', 'name']);
     }
     this.loadOrganizations();
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  onSortData(sort: Sort) {
+    this.sortState.set(sort);
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageSize.set(event.pageSize);
+    this.pageIndex.set(event.pageIndex);
   }
 
   loadOrganizations() {
     this.inventoryService.getOrganizations().subscribe((data) => {
-      this.dataSource.data = data;
-      this.cdr.markForCheck();
+      this.organizations.set(data);
     });
   }
 
@@ -66,3 +104,8 @@ export class OrganizationsList implements OnInit, AfterViewInit {
     }
   }
 }
+
+function compare(a: number | string, b: number | string, isAsc: boolean) {
+  return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+}
+

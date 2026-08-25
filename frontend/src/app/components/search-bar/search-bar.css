@@ -1,0 +1,21 @@
+.search-field {
+  width: 250px;
+}
+
+::ng-deep .search-field {
+  --mdc-outlined-text-field-container-shape: 16px;
+  --mat-form-field-container-shape: 16px;
+}
+
+::ng-deep .search-field .mdc-text-field--outlined {
+  border-radius: 16px;
+}
+
+::ng-deep .search-field .mdc-notched-outline__leading {
+  border-radius: 16px 0 0 16px !important;
+  width: 16px !important;
+}
+
+::ng-deep .search-field .mdc-notched-outline__trailing {
+  border-radius: 0 16px 16px 0 !important;
+}

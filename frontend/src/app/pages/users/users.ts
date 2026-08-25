@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ViewChild, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService, User, UserOrganization } from '../../core/services/user';
@@ -6,12 +6,13 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
-import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
 import { UserDialog } from '../../features/users/user-dialog/user-dialog';
+import { SearchBarComponent } from '../../components/search-bar/search-bar';
 
 @Component({
   selector: 'app-users',
@@ -25,7 +26,8 @@ import { UserDialog } from '../../features/users/user-dialog/user-dialog';
     MatPaginatorModule,
     MatSortModule,
     MatDialogModule,
-    MatChipsModule
+    MatChipsModule,
+    SearchBarComponent
   ],
   templateUrl: './users.html',
   styleUrls: ['./users.css']
@@ -38,26 +40,57 @@ export class Users implements OnInit {
   users = this.userService.users;
   organizations = signal<any[]>([]);
 
-  dataSource = new MatTableDataSource<User>([]);
-  displayedColumns: string[] = ['id', 'username', 'role', 'organizations', 'actions'];
+  displayedColumns = signal<string[]>(['id', 'username', 'role', 'organizations', 'actions']);
+  
+  searchQuery = signal<string>('');
+  pageSize = signal(10);
+  pageIndex = signal(0);
+  sortState = signal<Sort>({ active: '', direction: '' });
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  filteredUsers = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    let userList = this.users();
+    
+    if (query) {
+      userList = userList.filter(u => 
+        u.username.toLowerCase().includes(query) || 
+        u.role.toLowerCase().includes(query)
+      );
+    }
 
-  constructor() {
-    effect(() => {
-      this.dataSource.data = this.users();
-    });
-  }
+    const sort = this.sortState();
+    if (sort.active && sort.direction) {
+      userList = [...userList].sort((a, b) => {
+        const isAsc = sort.direction === 'asc';
+        switch (sort.active) {
+          case 'id': return compare(a.id, b.id, isAsc);
+          case 'username': return compare(a.username, b.username, isAsc);
+          case 'role': return compare(a.role, b.role, isAsc);
+          default: return 0;
+        }
+      });
+    }
+
+    return userList;
+  });
+
+  pagedUsers = computed(() => {
+    const startIndex = this.pageIndex() * this.pageSize();
+    return this.filteredUsers().slice(startIndex, startIndex + this.pageSize());
+  });
 
   ngOnInit() {
     this.userService.loadUsers().subscribe();
     this.loadOrganizations();
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  onSortData(sort: Sort) {
+    this.sortState.set(sort);
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageSize.set(event.pageSize);
+    this.pageIndex.set(event.pageIndex);
   }
 
   loadOrganizations() {
@@ -106,3 +139,8 @@ export class Users implements OnInit {
     }
   }
 }
+
+function compare(a: number | string, b: number | string, isAsc: boolean) {
+  return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+}
+

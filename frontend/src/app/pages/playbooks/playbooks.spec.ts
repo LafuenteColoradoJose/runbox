@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('Playbooks', () => {
   let component: Playbooks;
@@ -43,7 +44,7 @@ describe('Playbooks', () => {
     TestBed.overrideProvider(MatSnackBar, { useValue: mockSnackBar });
 
     await TestBed.configureTestingModule({
-      imports: [Playbooks],
+      imports: [Playbooks, NoopAnimationsModule],
       providers: [
         provideRouter([]),
         { provide: PlaybookService, useValue: mockPlaybookService },
@@ -65,6 +66,31 @@ describe('Playbooks', () => {
     expect(component).toBeTruthy();
     expect(component.playbooks().length).toBe(1);
     expect(component.loading()).toBe(false);
+  });
+
+  it('should filter playbooks by name and description', () => {
+    component.playbooks.set([
+      { id: 1, name: 'Setup Server', path: '', description: 'Initial setup', created_at: '' },
+      { id: 2, name: 'Deploy App', path: '', description: 'Frontend deployment', created_at: '' }
+    ]);
+    
+    // Buscar por nombre
+    component.searchQuery.set('setup');
+    expect(component.filteredPlaybooks().length).toBe(1);
+    expect(component.filteredPlaybooks()[0].name).toBe('Setup Server');
+
+    // Buscar por descripción
+    component.searchQuery.set('frontend');
+    expect(component.filteredPlaybooks().length).toBe(1);
+    expect(component.filteredPlaybooks()[0].name).toBe('Deploy App');
+
+    // Buscar texto que no existe
+    component.searchQuery.set('xyz');
+    expect(component.filteredPlaybooks().length).toBe(0);
+
+    // Búsqueda vacía retorna todos
+    component.searchQuery.set('');
+    expect(component.filteredPlaybooks().length).toBe(2);
   });
 
   it('should handle load playbooks error', () => {

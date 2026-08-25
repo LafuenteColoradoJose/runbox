@@ -81,3 +81,8 @@ Una vez en la vista de *Job Detail*, observarás una terminal negra clásica.
 
 ### 5. Consultar Ejecuciones Pasadas
 Si te vas de la pantalla o cierras la pestaña por error, no te preocupes. Todo el progreso queda guardado en la base de datos de manera persistente. Si vuelves a ingresar a la URL del trabajo, el log histórico se cargará inmediatamente desde donde se quedó.
+
+### 6. Búsqueda y Filtrado en Tiempo Real
+Todas las vistas principales (Playbooks, Organizaciones, Inventarios y Usuarios) cuentan con una **barra de búsqueda global unificada**.
+- La búsqueda es instantánea (en tiempo real) y reactiva.
+- Te permite localizar rápidamente recursos escribiendo cualquier parte del nombre, ID u otras propiedades visibles en la tabla.

@@ -1,15 +1,18 @@
 <div class="org-main-container">
   <div class="org-header">
     <h1>Organizations</h1>
-    @if (authService.currentUser()?.role === 'admin') {
-      <button mat-fab extended color="primary" (click)="openDialog()">
-        <mat-icon>add</mat-icon> Add Organization
-      </button>
-    }
+    <div class="header-actions">
+      <app-search-bar [(searchQuery)]="searchQuery"></app-search-bar>
+      @if (authService.currentUser()?.role === 'admin') {
+        <button mat-fab extended color="primary" (click)="openDialog()">
+          <mat-icon>add</mat-icon> Add Organization
+        </button>
+      }
+    </div>
   </div>
 
   <div class="table-container mat-elevation-z1">
-    <table mat-table [dataSource]="dataSource" matSort>
+    <table mat-table [dataSource]="pagedOrganizations()" matSort (matSortChange)="onSortData($event)">
       
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
@@ -35,16 +38,22 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns();" class="table-row"></tr>
       
       <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">
-          No organizations found. Click "Add Organization" to create one.
+        <td class="mat-cell empty-state" [attr.colspan]="displayedColumns().length">
+          No organizations found.
         </td>
       </tr>
     </table>
     
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of organizations"></mat-paginator>
+    <mat-paginator 
+      [length]="filteredOrganizations().length"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="onPageChange($event)"
+      aria-label="Select page of organizations">
+    </mat-paginator>
   </div>
 </div>

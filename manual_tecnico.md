@@ -39,9 +39,12 @@ Tanto la API como el Frontend (UI) se coordinan para el control de acceso:
 
 El frontend está estructurado siguiendo las mejores prácticas de Angular moderno (sin `NgModules`). 
 *   **App Shell**: Utiliza Angular Material para proporcionar un `Sidenav` y un `Toolbar` persistentes.
+*   **Reactividad Basada en Signals (Todo a Signals)**: La arquitectura prescinde completamente del antiguo patrón `MatTableDataSource` y flujos de RxJS complejos para las tablas. Todo el estado (datos originales, filtros de búsqueda, paginación y ordenamiento) se gestiona de manera declarativa y altamente eficiente utilizando **Angular Signals** (`signal`, `computed`, `model()`).
+*   **Componentes Compartidos**:
+    *   **SearchBarComponent (`<app-search-bar>`)**: Un componente reutilizable inyectado en todas las vistas principales que sincroniza de forma bidireccional el término de búsqueda, disparando la actualización en tiempo real del motor de filtrado basado en Signals.
 *   **Enrutamiento**: Declarativo en `app.routes.ts`.
-    *   `/dashboard`: Vista principal con gráficas (ECharts) de métricas del sistema, hosts y trabajos recientes. Todas las tablas incluyen soporte para paginación y ordenamiento.
-    *   `/playbooks`: Muestra la cuadrícula (Grid) de Playbooks disponibles.
+    *   `/dashboard`: Vista principal con gráficas (ECharts) de métricas del sistema, hosts y trabajos recientes.
+    *   `/playbooks`, `/organizations`, `/inventory`, `/users`: Vistas de datos unificadas, todas con soporte nativo de búsqueda en tiempo real, paginación y ordenamiento impulsado por Signals.
     *   `/jobs/:id`: Muestra la consola en tiempo real (Xterm.js) para un trabajo en ejecución.
 *   **WebSockets**: Implementados a través de un servicio inyectable (`SocketService`) que gestiona la conexión bidireccional con el servidor para la captura de logs (`log_stream` y `job_status`).
 *   **Consola y Gráficos**: `TerminalViewerComponent` monta una terminal de `xterm.js` con soporte para ResizeObserver. Además, se utilizan componentes visuales con `ngx-echarts` para monitorización de estados.

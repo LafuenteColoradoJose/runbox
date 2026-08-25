@@ -1,0 +1,9 @@
+<mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+  <mat-icon matPrefix>search</mat-icon>
+  <input matInput [placeholder]="placeholder()" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
+  @if (searchQuery()) {
+    <button mat-icon-button matSuffix (click)="searchQuery.set('')" aria-label="Clear">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+</mat-form-field>

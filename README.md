@@ -4,7 +4,7 @@
 
 Este proyecto ha sido desarrollado con una arquitectura robusta orientada a un entorno empresarial:
 - **Backend:** Node.js, Express, Better-SQLite3, Vitest (Testing), Integración nativa con Git (`simple-git`)
-- **Frontend:** Angular 22, Material Design, ECharts (Topología y Dashboard de métricas), Vitest (Testing)
+- **Frontend:** Angular 22 (Todo a Signals), Material Design, ECharts (Topología y Dashboard de métricas), Búsqueda Reactiva en Tiempo Real, Vitest (Testing)
 - **GitOps:** Soporte nativo para importar y ejecutar Playbooks directamente desde repositorios Git externos (públicos y privados).
 
 > [!NOTE]

@@ -12,11 +12,21 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../core/services/auth';
 import { PlaybookDialog } from '../../components/playbook-dialog/playbook-dialog';
 import { PlaybookRunDialog } from '../../components/playbook-run-dialog/playbook-run-dialog';
+import { SearchBarComponent } from '../../components/search-bar/search-bar';
 
 @Component({
   selector: 'app-playbooks',
   standalone: true,
-  imports: [PlaybookCard, MatProgressSpinnerModule, MatSnackBarModule, MatDialogModule, MatButtonModule, MatIconModule, MatPaginatorModule],
+  imports: [
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatDialogModule,
+    MatIconModule,
+    MatButtonModule,
+    MatPaginatorModule,
+    PlaybookCard,
+    SearchBarComponent
+  ],
   templateUrl: './playbooks.html',
   styleUrl: './playbooks.css',
 })
@@ -31,12 +41,25 @@ export class Playbooks implements OnInit {
   loading = signal<boolean>(true);
   isAdmin = computed(() => this.auth.currentUser()?.role === 'admin');
 
+  searchQuery = signal<string>('');
+
   pageSize = signal(10);
   pageIndex = signal(0);
 
+  filteredPlaybooks = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) {
+      return this.playbooks();
+    }
+    return this.playbooks().filter(p => 
+      p.name.toLowerCase().includes(query) || 
+      (p.description && p.description.toLowerCase().includes(query))
+    );
+  });
+
   pagedPlaybooks = computed(() => {
     const startIndex = this.pageIndex() * this.pageSize();
-    return this.playbooks().slice(startIndex, startIndex + this.pageSize());
+    return this.filteredPlaybooks().slice(startIndex, startIndex + this.pageSize());
   });
 
   onPageChange(event: PageEvent) {
