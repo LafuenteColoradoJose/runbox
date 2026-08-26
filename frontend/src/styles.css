@@ -14,3 +14,36 @@ html, body { height: 100%; margin: 0; font-family: Roboto, "Helvetica Neue", san
   width: auto !important;
   padding-right: 8px !important;
 }
+
+/* Global Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.status-badge.success {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
+.status-badge.primary {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.status-badge.info {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.badges-container {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}

@@ -43,6 +43,7 @@ El frontend está estructurado siguiendo las mejores prácticas de Angular moder
 *   **Componentes Compartidos**:
     *   **SearchBarComponent (`<app-search-bar>`)**: Un componente reutilizable inyectado en todas las vistas principales que sincroniza de forma bidireccional el término de búsqueda, disparando la actualización en tiempo real del motor de filtrado basado en Signals.
     *   **PlaybookCardComponent (`<app-playbook-card>`)**: Componente presentacional encargado del renderizado moderno de los playbooks, implementando la directiva de Angular Material e iterando un sistema estético de _tags_ extraídas del JSON del backend.
+*   **Estilos Globales y UI Compacta**: Se ha consolidado el sistema de insignias de estado en una clase CSS global (`.status-badge` en `styles.css`). Esto sustituye componentes pesados de Material (como `mat-chip`) por elementos HTML nativos y estilizados, lo que reduce la sobrecarga del DOM y permite una visualización más limpia y compacta en las tablas de datos (Dashboard, Usuarios, Inventarios).
 *   **Enrutamiento**: Declarativo en `app.routes.ts`.
     *   `/dashboard`: Vista principal con gráficas (ECharts) de métricas del sistema, hosts y trabajos recientes.
     *   `/playbooks`, `/organizations`, `/inventory`, `/users`: Vistas de datos unificadas, todas con soporte nativo de búsqueda en tiempo real, paginación y ordenamiento impulsado por Signals.

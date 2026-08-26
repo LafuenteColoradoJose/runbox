@@ -21,11 +21,18 @@
   flex-direction: column;
 }
 
+/* Top Section (Stats & Chart) */
+.dashboard-top-section {
+  display: grid;
+  grid-template-columns: 35% 65%;
+  gap: 1.5rem;
+}
+
 /* Grid Stats */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 
 .stat-card {
@@ -40,14 +47,14 @@
 .stat-card-content {
   display: flex;
   align-items: center;
-  padding: 1.5rem !important;
-  gap: 1.5rem;
+  padding: 1rem !important;
+  gap: 1rem;
 }
 
 .stat-icon-container {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,9 +63,9 @@
 }
 
 .stat-icon {
-  font-size: 28px;
-  width: 28px;
-  height: 28px;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .failed-icon-container {
@@ -72,15 +79,27 @@
 
 .stat-label {
   color: var(--mat-sys-on-surface-variant);
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.15rem 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-size: 0.75rem;
 }
 
 .stat-value {
   color: var(--mat-sys-on-surface);
   margin: 0;
   line-height: 1;
+}
+
+/* Chart */
+.chart-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-chart {
+  width: 100%;
+  height: 260px;
 }
 
 /* Recent Jobs */
@@ -110,13 +129,13 @@
 
 .jobs-table th {
   text-align: left;
-  padding: 1rem;
+  padding: 4px 1rem;
   color: var(--mat-sys-on-surface-variant);
   border-bottom: 1px solid var(--mat-sys-outline-variant);
 }
 
 .jobs-table td {
-  padding: 1rem;
+  padding: 4px 1rem;
   border-bottom: 1px solid var(--mat-sys-outline-variant);
 }
 

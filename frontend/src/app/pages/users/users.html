@@ -42,15 +42,15 @@
         <th mat-header-cell *matHeaderCellDef> Organizations </th>
         <td mat-cell *matCellDef="let user">
           @if (user.role === 'admin') {
-            <mat-chip-set>
-              <mat-chip color="primary" highlighted>All (Global)</mat-chip>
-            </mat-chip-set>
+            <div class="badges-container">
+              <span class="status-badge primary">All (Global)</span>
+            </div>
           } @else if (user.organizations && user.organizations.length > 0) {
-            <mat-chip-set>
+            <div class="badges-container">
               @for (org of user.organizations; track org.id) {
-                <mat-chip>{{ org.name }}</mat-chip>
+                <span class="status-badge">{{ org.name }}</span>
               }
-            </mat-chip-set>
+            </div>
           } @else {
             <span class="text-muted">None</span>
           }

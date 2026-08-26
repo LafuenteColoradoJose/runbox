@@ -45,27 +45,7 @@ table {
   color: var(--mat-sys-on-surface);
 }
 
-/* Badges */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: var(--mat-sys-surface-container-highest);
-  color: var(--mat-sys-on-surface-variant);
-}
 
-.status-badge.success {
-  background: var(--mat-sys-tertiary-container);
-  color: var(--mat-sys-on-tertiary-container);
-}
-
-.status-badge.info {
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
-}
 
 .text-muted {
   color: var(--mat-sys-on-surface-variant);

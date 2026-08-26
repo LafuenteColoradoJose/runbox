@@ -10,89 +10,102 @@
   </header>
 
   @if (stats(); as s) {
-    <!-- Overview Cards -->
-    <div class="stats-grid">
-      <mat-card appearance="outlined" class="stat-card">
-        <mat-card-content class="stat-card-content">
-          <div class="stat-icon-container">
-            <mat-icon color="primary" class="stat-icon">business</mat-icon>
-          </div>
-          <div class="stat-info">
-            <p class="mat-label-large stat-label">Organizations</p>
-            <h2 class="mat-display-medium stat-value">{{ s.totalOrganizations }}</h2>
-          </div>
-        </mat-card-content>
-      </mat-card>
+    <!-- Top Section (Stats & Chart) -->
+    <div class="dashboard-top-section">
+      <!-- Overview Cards -->
+      <div class="stats-grid">
+        <mat-card appearance="outlined" class="stat-card">
+          <mat-card-content class="stat-card-content">
+            <div class="stat-icon-container">
+              <mat-icon color="primary" class="stat-icon">business</mat-icon>
+            </div>
+            <div class="stat-info">
+              <p class="mat-label-small stat-label">Orgs</p>
+              <h2 class="mat-title-medium stat-value">{{ s.totalOrganizations }}</h2>
+            </div>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-card appearance="outlined" class="stat-card">
-        <mat-card-content class="stat-card-content">
-          <div class="stat-icon-container">
-            <mat-icon color="primary" class="stat-icon">inventory_2</mat-icon>
-          </div>
-          <div class="stat-info">
-            <p class="mat-label-large stat-label">Inventories</p>
-            <h2 class="mat-display-medium stat-value">{{ s.totalInventories }}</h2>
-          </div>
-        </mat-card-content>
-      </mat-card>
+        <mat-card appearance="outlined" class="stat-card">
+          <mat-card-content class="stat-card-content">
+            <div class="stat-icon-container">
+              <mat-icon color="primary" class="stat-icon">inventory_2</mat-icon>
+            </div>
+            <div class="stat-info">
+              <p class="mat-label-small stat-label">Inventories</p>
+              <h2 class="mat-title-medium stat-value">{{ s.totalInventories }}</h2>
+            </div>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-card appearance="outlined" class="stat-card">
-        <mat-card-content class="stat-card-content">
-          <div class="stat-icon-container">
-            <mat-icon color="primary" class="stat-icon">groups</mat-icon>
-          </div>
-          <div class="stat-info">
-            <p class="mat-label-large stat-label">Groups</p>
-            <h2 class="mat-display-medium stat-value">{{ s.totalGroups }}</h2>
-          </div>
-        </mat-card-content>
-      </mat-card>
+        <mat-card appearance="outlined" class="stat-card">
+          <mat-card-content class="stat-card-content">
+            <div class="stat-icon-container">
+              <mat-icon color="primary" class="stat-icon">groups</mat-icon>
+            </div>
+            <div class="stat-info">
+              <p class="mat-label-small stat-label">Groups</p>
+              <h2 class="mat-title-medium stat-value">{{ s.totalGroups }}</h2>
+            </div>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-card appearance="outlined" class="stat-card">
-        <mat-card-content class="stat-card-content">
-          <div class="stat-icon-container">
-            <mat-icon color="primary" class="stat-icon">dns</mat-icon>
-          </div>
-          <div class="stat-info">
-            <p class="mat-label-large stat-label">Hosts</p>
-            <h2 class="mat-display-medium stat-value">{{ s.totalHosts }}</h2>
-          </div>
-        </mat-card-content>
-      </mat-card>
+        <mat-card appearance="outlined" class="stat-card">
+          <mat-card-content class="stat-card-content">
+            <div class="stat-icon-container">
+              <mat-icon color="primary" class="stat-icon">dns</mat-icon>
+            </div>
+            <div class="stat-info">
+              <p class="mat-label-small stat-label">Hosts</p>
+              <h2 class="mat-title-medium stat-value">{{ s.totalHosts }}</h2>
+            </div>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-card appearance="outlined" class="stat-card">
-        <mat-card-content class="stat-card-content">
-          <div class="stat-icon-container">
-            <mat-icon color="primary" class="stat-icon">menu_book</mat-icon>
-          </div>
-          <div class="stat-info">
-            <p class="mat-label-large stat-label">Playbooks</p>
-            <h2 class="mat-display-medium stat-value">{{ s.totalPlaybooks }}</h2>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      
-      <mat-card appearance="outlined" class="stat-card">
-        <mat-card-content class="stat-card-content">
-          <div class="stat-icon-container">
-            <mat-icon color="primary" class="stat-icon">play_circle</mat-icon>
-          </div>
-          <div class="stat-info">
-            <p class="mat-label-large stat-label">Executions</p>
-            <h2 class="mat-display-medium stat-value">{{ s.totalJobs }}</h2>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      
-      <mat-card appearance="outlined" class="stat-card failed-card">
-        <mat-card-content class="stat-card-content">
-          <div class="stat-icon-container failed-icon-container">
-            <mat-icon color="warn" class="stat-icon">error</mat-icon>
-          </div>
-          <div class="stat-info">
-            <p class="mat-label-large stat-label">Failed</p>
-            <h2 class="mat-display-medium stat-value">{{ s.failedJobs }}</h2>
-          </div>
+        <mat-card appearance="outlined" class="stat-card">
+          <mat-card-content class="stat-card-content">
+            <div class="stat-icon-container">
+              <mat-icon color="primary" class="stat-icon">menu_book</mat-icon>
+            </div>
+            <div class="stat-info">
+              <p class="mat-label-small stat-label">Playbooks</p>
+              <h2 class="mat-title-medium stat-value">{{ s.totalPlaybooks }}</h2>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        
+        <mat-card appearance="outlined" class="stat-card">
+          <mat-card-content class="stat-card-content">
+            <div class="stat-icon-container">
+              <mat-icon color="primary" class="stat-icon">play_circle</mat-icon>
+            </div>
+            <div class="stat-info">
+              <p class="mat-label-small stat-label">Executions</p>
+              <h2 class="mat-title-medium stat-value">{{ s.totalJobs }}</h2>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        
+        <mat-card appearance="outlined" class="stat-card failed-card">
+          <mat-card-content class="stat-card-content">
+            <div class="stat-icon-container failed-icon-container">
+              <mat-icon color="warn" class="stat-icon">error</mat-icon>
+            </div>
+            <div class="stat-info">
+              <p class="mat-label-small stat-label">Failed</p>
+              <h2 class="mat-title-medium stat-value">{{ s.failedJobs }}</h2>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Chart -->
+      <mat-card appearance="outlined" class="chart-card">
+        <mat-card-header>
+          <mat-card-title class="mat-title-medium">Task Status</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div echarts [options]="chartOption()" class="stats-chart"></div>
         </mat-card-content>
       </mat-card>
     </div>
