@@ -6,6 +6,16 @@ import { of } from 'rxjs';
 import { signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
+import { provideEchartsCore } from 'ngx-echarts';
+import * as echarts from 'echarts';
+
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+globalThis.ResizeObserver = ResizeObserverMock as any;
+
 describe('Dashboard', () => {
   let component: Dashboard;
   let fixture: ComponentFixture<Dashboard>;
@@ -29,7 +39,8 @@ describe('Dashboard', () => {
       providers: [
         { provide: DashboardService, useValue: mockDashboardService },
         { provide: AuthService, useValue: mockAuthService },
-        { provide: ActivatedRoute, useValue: {} }
+        { provide: ActivatedRoute, useValue: {} },
+        provideEchartsCore({ echarts })
       ]
     }).compileComponents();
 

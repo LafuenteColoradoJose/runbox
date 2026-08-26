@@ -42,14 +42,14 @@ describe('OrganizationsList', () => {
 
   it('should create and load organizations', () => {
     expect(component).toBeTruthy();
-    expect(component.dataSource.data.length).toBe(1);
-    expect(component.displayedColumns).toEqual(['id', 'name', 'actions']);
+    expect(component.organizations().length).toBe(1);
+    expect(component.displayedColumns()).toEqual(['id', 'name', 'stats', 'created_at', 'actions']);
   });
 
   it('should remove actions column if user is not admin', () => {
     mockAuthService.currentUser.mockReturnValue({ role: 'user' });
     component.ngOnInit();
-    expect(component.displayedColumns).toEqual(['id', 'name']);
+    expect(component.displayedColumns()).toEqual(['id', 'name', 'stats', 'created_at']);
   });
 
   it('should open dialog and reload on close with result', () => {

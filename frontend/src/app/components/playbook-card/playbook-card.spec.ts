@@ -34,8 +34,8 @@ describe('PlaybookCard', () => {
 
   it('should render playbook name and path', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('mat-card-title')?.textContent).toContain('Test Playbook');
-    expect(compiled.querySelector('mat-card-subtitle')?.textContent).toContain('/path/to/playbook');
+    expect(compiled.querySelector('.playbook-title')?.textContent).toContain('Test Playbook');
+    expect(compiled.querySelector('.source-badge')?.textContent).toContain('Local Path');
   });
 
   it('should render git_repo_url when source_type is git', () => {
@@ -46,7 +46,7 @@ describe('PlaybookCard', () => {
     });
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('mat-card-subtitle')?.textContent).toContain('Git: https://github.com/org/repo.git');
+    expect(compiled.querySelector('.source-badge')?.textContent).toContain('Git Repo');
   });
 
   it('should emit onRun when button is clicked', () => {

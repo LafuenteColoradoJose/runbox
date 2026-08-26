@@ -43,7 +43,7 @@ describe('OrganizationDialog', () => {
   });
 
   it('should not call create or update if form is invalid', () => {
-    component.orgForm.setValue({ name: '' });
+    component.orgForm.patchValue({ name: '' });
     component.save();
     expect(mockInventoryService.createOrganization).not.toHaveBeenCalled();
     expect(mockInventoryService.updateOrganization).not.toHaveBeenCalled();
@@ -51,12 +51,12 @@ describe('OrganizationDialog', () => {
   });
 
   it('should call createOrganization and close dialog when no id is provided', () => {
-    component.orgForm.setValue({ name: 'New Org' });
+    component.orgForm.patchValue({ name: 'New Org' });
     mockInventoryService.createOrganization.mockReturnValue(of({ id: 1, name: 'New Org', description: '' }));
     
     component.save();
     
-    expect(mockInventoryService.createOrganization).toHaveBeenCalledWith({ name: 'New Org' });
+    expect(mockInventoryService.createOrganization).toHaveBeenCalledWith({ name: 'New Org', description: '' });
     expect(mockDialogRef.close).toHaveBeenCalledWith(true);
   });
 });
@@ -96,12 +96,12 @@ describe('OrganizationDialog with DATA', () => {
   });
 
   it('should call updateOrganization and close dialog when id is provided', () => {
-    component.orgForm.setValue({ name: 'Updated Org' });
+    component.orgForm.patchValue({ name: 'Updated Org' });
     mockInventoryService.updateOrganization.mockReturnValue(of({ id: 1, name: 'Updated Org', description: '' }));
     
     component.save();
     
-    expect(mockInventoryService.updateOrganization).toHaveBeenCalledWith(1, { name: 'Updated Org' });
+    expect(mockInventoryService.updateOrganization).toHaveBeenCalledWith(1, { name: 'Updated Org', description: '' });
     expect(mockDialogRef.close).toHaveBeenCalledWith(true);
   });
 });

@@ -46,8 +46,8 @@ describe('InventoryComponent', () => {
 
   it('should create and load inventories for admin', () => {
     expect(component).toBeTruthy();
-    expect(component.dataSource.data.length).toBe(2);
-    expect(component.displayedColumns).toEqual(['name', 'organization', 'actions']);
+    expect(component.inventories().length).toBe(2);
+    expect(component.displayedColumns()).toEqual(['name', 'organization', 'actions']);
   });
 
   it('should remove actions column if user is not admin', () => {
@@ -56,7 +56,7 @@ describe('InventoryComponent', () => {
     const localComponent = localFixture.componentInstance;
     localFixture.detectChanges();
     
-    expect(localComponent.displayedColumns).toEqual(['name', 'organization']);
+    expect(localComponent.displayedColumns()).toEqual(['name', 'organization']);
   });
 
   it('should open dialog and reload on close with result', () => {

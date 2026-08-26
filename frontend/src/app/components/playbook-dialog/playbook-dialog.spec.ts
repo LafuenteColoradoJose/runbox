@@ -91,7 +91,7 @@ describe('PlaybookDialog', () => {
   });
 
   it('should call createPlaybook and close dialog when no data is provided (create mode)', () => {
-    component.playbookForm.setValue({ 
+    component.playbookForm.patchValue({ 
       name: 'New Playbook', 
       source_type: 'local_path',
       path: '/path', 
@@ -99,7 +99,8 @@ describe('PlaybookDialog', () => {
       git_repo_url: '',
       git_branch: '',
       git_path: '',
-      organization_id: 1 
+      organization_id: 1,
+      tagsRaw: ''
     });
     playbookServiceSpy.createPlaybook.mockReturnValue(of({ id: 1, name: 'New Playbook', path: '/path', organization_id: 1, created_at: '', updated_at: '' }));
     
@@ -113,7 +114,8 @@ describe('PlaybookDialog', () => {
       git_repo_url: '',
       git_branch: '',
       git_path: '',
-      organization_id: 1 
+      organization_id: 1,
+      tags: []
     });
     expect(dialogRefSpy.close).toHaveBeenCalledWith(true);
   });
@@ -185,14 +187,21 @@ describe('PlaybookDialog with DATA (edit mode)', () => {
       git_repo_url: 'https://github.com/user/repo-updated.git',
       git_branch: 'develop',
       git_path: 'site.yml',
-      organization_id: 2 
+      organization_id: 2,
+      tagsRaw: ''
     };
-    component.playbookForm.setValue(updatedValue);
+    component.playbookForm.patchValue(updatedValue);
     playbookServiceSpy.updatePlaybook.mockReturnValue(of({ id: 5, ...updatedValue, created_at: '', updated_at: '' }));
     
     component.onSubmit();
     
-    expect(playbookServiceSpy.updatePlaybook).toHaveBeenCalledWith(5, updatedValue);
+    const expectedValue = {
+      ...updatedValue,
+      tags: []
+    };
+    delete (expectedValue as any).tagsRaw;
+
+    expect(playbookServiceSpy.updatePlaybook).toHaveBeenCalledWith(5, expectedValue);
     expect(dialogRefSpy.close).toHaveBeenCalledWith(true);
   });
 });
