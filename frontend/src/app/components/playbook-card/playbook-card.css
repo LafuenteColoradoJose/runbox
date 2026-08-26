@@ -79,6 +79,12 @@
   border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
+:host-context(.dark-theme) .tag-badge {
+  background-color: rgba(165, 214, 167, 0.1);
+  color: #a5d6a7; /* Light green 200 for better contrast on dark */
+  border-color: rgba(165, 214, 167, 0.3);
+}
+
 /* LIST MODE */
 .playbook-card.list-mode {
   flex-direction: row;
