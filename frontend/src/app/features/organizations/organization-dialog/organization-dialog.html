@@ -8,6 +8,11 @@
         <mat-error>Name is required</mat-error>
       }
     </mat-form-field>
+    
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" placeholder="A brief description of this organization" rows="3"></textarea>
+    </mat-form-field>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

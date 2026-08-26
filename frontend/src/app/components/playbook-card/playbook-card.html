@@ -1,35 +1,33 @@
 <mat-card class="playbook-card" [class.list-mode]="viewMode() === 'list'" appearance="outlined">
-  <mat-card-header>
-    <mat-icon mat-card-avatar class="playbook-icon">integration_instructions</mat-icon>
-    <mat-card-title>{{ playbook().name }}</mat-card-title>
-    <mat-card-subtitle class="source-container">
-      @if (playbook().source_type === 'database') {
-        <div class="source-badge" matTooltip="Saved in Database">
-          <mat-icon inline>storage</mat-icon> Database
-        </div>
-      } @else if (playbook().source_type === 'git') {
-        <div class="source-badge" [matTooltip]="playbook().git_repo_url || ''">
-          <mat-icon inline>account_tree</mat-icon> Git Repository
-        </div>
-      } @else {
-        <div class="source-badge" [matTooltip]="playbook().path || ''">
-          <mat-icon inline>folder</mat-icon> Local Path
-        </div>
-      }
-    </mat-card-subtitle>
-  </mat-card-header>
+  
+  <div class="card-main">
+    <mat-icon class="playbook-icon">integration_instructions</mat-icon>
+    <div class="playbook-title">{{ playbook().name }}</div>
+  </div>
 
-  @if (playbook().tags && playbook().tags!.length > 0) {
-    <mat-card-content>
-      <mat-chip-set class="playbook-tags">
-        @for (tag of playbook().tags; track tag) {
-          <mat-chip class="tag-chip">{{ tag }}</mat-chip>
-        }
-      </mat-chip-set>
-    </mat-card-content>
-  }
+  <div class="card-meta">
+    @if (playbook().source_type === 'database') {
+      <span class="badge source-badge" matTooltip="Saved in Database">
+        <mat-icon inline>storage</mat-icon> Database
+      </span>
+    } @else if (playbook().source_type === 'git') {
+      <span class="badge source-badge" [matTooltip]="playbook().git_repo_url || ''">
+        <mat-icon inline>account_tree</mat-icon> Git Repo
+      </span>
+    } @else {
+      <span class="badge source-badge" [matTooltip]="playbook().path || ''">
+        <mat-icon inline>folder</mat-icon> Local Path
+      </span>
+    }
 
-  <mat-card-actions align="end">
+    @for (tag of playbook().tags; track tag) {
+      <span class="badge tag-badge">{{ tag }}</span>
+    }
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="card-actions">
     @if (isAdmin()) {
       <button mat-icon-button color="primary" (click)="onEdit.emit(playbook())" matTooltip="Edit">
         <mat-icon>edit</mat-icon>
@@ -38,8 +36,8 @@
         <mat-icon>delete</mat-icon>
       </button>
     }
-    <button mat-icon-button (click)="onRun.emit(playbook())" class="run-btn" matTooltip="Run">
-      <mat-icon>play_arrow</mat-icon>
+    <button mat-icon-button class="run-btn" color="primary" (click)="onRun.emit(playbook())" matTooltip="Run">
+      <mat-icon>play_circle</mat-icon>
     </button>
-  </mat-card-actions>
+  </div>
 </mat-card>

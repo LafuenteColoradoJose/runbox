@@ -156,8 +156,9 @@ export class InventoryDetail implements OnInit {
               symbolSize: 15,
               label: {
                 position: 'top',
-                verticalAlign: 'middle',
+                verticalAlign: 'bottom',
                 align: 'center',
+                distance: 10,
                 fontSize: 14,
                 backgroundColor: 'rgba(255,255,255,0.8)',
                 padding: [2, 4],
@@ -168,6 +169,7 @@ export class InventoryDetail implements OnInit {
                   position: 'right',
                   verticalAlign: 'middle',
                   align: 'left',
+                  distance: 10,
                 },
               },
               expandAndCollapse: true,

@@ -2,90 +2,105 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 8px;
+  padding: 16px;
+  gap: 12px;
+}
+
+.card-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .playbook-icon {
-  font-size: 32px;
-  height: 32px;
-  width: 32px;
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
   color: var(--mat-sys-primary);
 }
 
-mat-card-content {
+.playbook-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.spacer {
   flex-grow: 1;
-  margin-top: 16px;
-  color: var(--mat-sys-on-surface-variant);
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
 }
 
 .run-btn {
-  background-color: var(--mat-sys-primary) !important;
-  color: var(--mat-sys-on-primary) !important;
-  margin-left: 8px;
+  transform: scale(1.1);
 }
 
-
-
-mat-card-subtitle {
-  word-break: break-word;
-}
-
-.source-container {
-  margin-top: 6px;
-}
-
-.source-badge {
+.badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background-color: var(--mat-sys-surface-container-highest);
-  color: var(--mat-sys-on-surface-variant);
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 2px 8px;
+  border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 500;
+  height: 24px;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.source-badge mat-icon {
+.badge mat-icon {
   font-size: 14px;
   width: 14px;
   height: 14px;
 }
 
-/* List mode specific styles */
+.source-badge {
+  background-color: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.tag-badge {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+/* LIST MODE */
 .playbook-card.list-mode {
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
   padding: 8px 16px;
+  gap: 16px;
 }
 
-.playbook-card.list-mode mat-card-header {
+.playbook-card.list-mode .card-main {
   flex: 1;
-  display: flex;
-  align-items: center;
+  min-width: 200px;
 }
 
-.playbook-card.list-mode mat-card-actions {
-  margin-bottom: 0;
-  padding: 0;
+.playbook-card.list-mode .card-meta {
+  flex: 2;
+  justify-content: flex-start;
 }
 
-.playbook-tags {
-  margin-top: 8px;
+.playbook-card.list-mode .spacer {
+  display: none;
 }
 
-.playbook-card.list-mode .playbook-tags {
-  margin-top: 0;
-  margin-left: 16px;
-  flex: 1;
-}
-
-.tag-chip {
-  min-height: 24px;
-  font-size: 0.75rem;
-  background-color: rgba(76, 175, 80, 0.1) !important;
-  color: #2e7d32 !important;
-  border: 1px solid rgba(76, 175, 80, 0.3) !important;
-  font-weight: 500;
+.playbook-card.list-mode .card-actions {
+  flex-shrink: 0;
 }

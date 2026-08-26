@@ -66,3 +66,42 @@
   text-align: center;
   color: var(--text-muted);
 }
+
+.org-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.org-description {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.stats-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: var(--hover-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.stat-badge mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+}
+

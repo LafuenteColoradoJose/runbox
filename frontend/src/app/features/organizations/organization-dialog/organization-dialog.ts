@@ -27,6 +27,7 @@ export class OrganizationDialog {
 
   orgForm: FormGroup = this.fb.group({
     name: [this.data?.name || '', Validators.required],
+    description: [this.data?.description || ''],
   });
 
   save() {

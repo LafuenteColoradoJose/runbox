@@ -503,10 +503,20 @@ app.get('/api/organizations', authMiddleware, (req, res) => {
   try {
     let orgs;
     if (req.user.role === 'admin') {
-      orgs = db.prepare('SELECT * FROM organizations').all();
+      orgs = db.prepare(`
+        SELECT o.*,
+          (SELECT COUNT(*) FROM user_organizations WHERE organization_id = o.id) as users_count,
+          (SELECT COUNT(*) FROM playbooks WHERE organization_id = o.id) as playbooks_count,
+          (SELECT COUNT(*) FROM inventories WHERE organization_id = o.id) as inventories_count
+        FROM organizations o
+      `).all();
     } else {
       orgs = db.prepare(`
-        SELECT o.* FROM organizations o 
+        SELECT o.*,
+          (SELECT COUNT(*) FROM user_organizations WHERE organization_id = o.id) as users_count,
+          (SELECT COUNT(*) FROM playbooks WHERE organization_id = o.id) as playbooks_count,
+          (SELECT COUNT(*) FROM inventories WHERE organization_id = o.id) as inventories_count
+        FROM organizations o 
         JOIN user_organizations uo ON o.id = uo.organization_id 
         WHERE uo.user_id = ?
       `).all(req.user.id);
@@ -517,17 +527,17 @@ app.get('/api/organizations', authMiddleware, (req, res) => {
 
 app.post('/api/organizations', authMiddleware, requireAdmin, (req, res) => {
   try {
-    const { name } = req.body;
-    const stmt = db.prepare('INSERT INTO organizations (name) VALUES (?)');
-    const result = stmt.run(name);
-    res.json({ id: result.lastInsertRowid, name });
+    const { name, description } = req.body;
+    const stmt = db.prepare("INSERT INTO organizations (name, description, created_at) VALUES (?, ?, datetime('now'))");
+    const result = stmt.run(name, description || null);
+    res.json({ id: result.lastInsertRowid, name, description, created_at: new Date().toISOString() });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.put('/api/organizations/:id', authMiddleware, requireAdmin, (req, res) => {
   try {
-    const { name } = req.body;
-    db.prepare('UPDATE organizations SET name = ? WHERE id = ?').run(name, req.params.id);
+    const { name, description } = req.body;
+    db.prepare('UPDATE organizations SET name = ?, description = ? WHERE id = ?').run(name, description || null, req.params.id);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

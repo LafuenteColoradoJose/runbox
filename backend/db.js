@@ -53,7 +53,9 @@ db.init = function() {
 
     CREATE TABLE IF NOT EXISTS organizations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL UNIQUE
+      name TEXT NOT NULL UNIQUE,
+      description TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS user_organizations (
@@ -112,6 +114,14 @@ db.init = function() {
   }
   if (!playbooksCols.find(c => c.name === 'tags')) {
     db.exec("ALTER TABLE playbooks ADD COLUMN tags TEXT DEFAULT '[]'");
+  }
+
+  const orgsCols = db.prepare("PRAGMA table_info(organizations)").all();
+  if (!orgsCols.find(c => c.name === 'description')) {
+    db.exec("ALTER TABLE organizations ADD COLUMN description TEXT");
+  }
+  if (!orgsCols.find(c => c.name === 'created_at')) {
+    db.exec("ALTER TABLE organizations ADD COLUMN created_at DATETIME");
   }
 
   const jobsCols = db.prepare("PRAGMA table_info(jobs)").all();

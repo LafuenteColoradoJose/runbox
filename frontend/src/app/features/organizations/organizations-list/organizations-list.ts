@@ -11,9 +11,11 @@ import { OrganizationDialog } from '../organization-dialog/organization-dialog';
 import { AuthService } from '../../../core/services/auth';
 import { SearchBarComponent } from '../../../components/search-bar/search-bar';
 
+import { DatePipe } from '@angular/common';
+
 @Component({
   selector: 'app-organizations-list',
-  imports: [MatTableModule, MatPaginatorModule, MatSortModule, MatButtonModule, MatIconModule, MatDialogModule, SearchBarComponent],
+  imports: [MatTableModule, MatPaginatorModule, MatSortModule, MatButtonModule, MatIconModule, MatDialogModule, SearchBarComponent, DatePipe],
   templateUrl: './organizations-list.html',
   styleUrl: './organizations-list.css',
 })
@@ -22,7 +24,7 @@ export class OrganizationsList implements OnInit {
   private dialog = inject(MatDialog);
   public authService = inject(AuthService);
 
-  displayedColumns = signal<string[]>(['id', 'name', 'actions']);
+  displayedColumns = signal<string[]>(['id', 'name', 'stats', 'created_at', 'actions']);
   
   organizations = signal<Organization[]>([]);
   searchQuery = signal<string>('');
@@ -65,7 +67,7 @@ export class OrganizationsList implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.currentUser()?.role !== 'admin') {
-      this.displayedColumns.set(['id', 'name']);
+      this.displayedColumns.set(['id', 'name', 'stats', 'created_at']);
     }
     this.loadOrganizations();
   }

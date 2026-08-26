@@ -6,6 +6,11 @@ import { environment } from '../../../environments/environment';
 export interface Organization {
   id: number;
   name: string;
+  description?: string;
+  created_at?: string;
+  users_count?: number;
+  playbooks_count?: number;
+  inventories_count?: number;
 }
 
 export interface Group {
