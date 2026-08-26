@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -35,6 +35,17 @@ export class Dashboard {
 
   public currentUser = this.authService.currentUser;
   public stats = toSignal(this.dashboardService.getStats());
+  private isDarkMode = signal<boolean>(false);
+
+  constructor() {
+    if (typeof document !== 'undefined') {
+      this.isDarkMode.set(document.documentElement.classList.contains('dark-theme'));
+      const observer = new MutationObserver(() => {
+        this.isDarkMode.set(document.documentElement.classList.contains('dark-theme'));
+      });
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    }
+  }
 
   public chartOption = computed<EChartsOption>(() => {
     const data = this.stats();
@@ -48,13 +59,24 @@ export class Dashboard {
     const successColor = '#67deb6'; // Soft mint/cyan for success
     const failedColor = '#ffb4ab';  // Soft red for failed
 
+    // ECharts Canvas fails to parse var(--mat-sys-on-surface).
+    // We must pass strict HEX colors depending on the active theme.
+    const textColor = this.isDarkMode() ? '#e2e2e2' : '#1f1f1f';
+
     return {
+      textStyle: {
+        color: textColor
+      },
       tooltip: {
         trigger: 'axis',
-        axisPointer: { type: 'shadow' }
+        axisPointer: { type: 'shadow' },
+        backgroundColor: this.isDarkMode() ? '#1e1e1e' : '#ffffff',
+        borderColor: this.isDarkMode() ? '#444' : '#ccc',
+        textStyle: { color: textColor }
       },
       legend: {
         data: ['Success', 'Failed'],
+        textStyle: { color: textColor },
         top: 0,
         right: 10
       },
@@ -68,12 +90,14 @@ export class Dashboard {
       xAxis: [
         {
           type: 'category',
-          data: ['All Time Executions']
+          data: ['All Time Executions'],
+          axisLabel: { color: textColor }
         }
       ],
       yAxis: [
         {
-          type: 'value'
+          type: 'value',
+          axisLabel: { color: textColor }
         }
       ],
       series: [
