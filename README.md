@@ -13,6 +13,25 @@ Este proyecto ha sido desarrollado con una arquitectura robusta orientada a un e
 
 ---
 
+## 📸 Galería
+
+### Dashboard Principal
+![Dashboard](docs/images/Dashboard.png)
+
+### Gestión de Playbooks
+![Playbooks](docs/images/Playbooks.png)
+
+### Topología de Inventario
+![Topologia](docs/images/Topologia.png)
+
+### Ejecución en Tiempo Real (Visor de Terminal)
+![Terminal](docs/images/Terminal.png)
+
+### Diseño y Formularios
+![Modal](docs/images/Modal.png)
+
+---
+
 ## 📚 Documentación
 
 En este repositorio se encuentran los manuales completos del proyecto:
